@@ -1,0 +1,18 @@
+name: Deploy www.nvo.one
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Deploy-to-S3:
+    runs-on: ubuntu-latest
+    environment: Dev
+
+    steps:
+        # Login AWS CLI
+
+
+        # Run AWS Invalidation CLI
+
+
+        # Chech status
