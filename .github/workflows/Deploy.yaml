@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   Deploy-to-S3:
@@ -44,4 +45,3 @@ jobs:
 
 
       # copy Public to website bucket
-      
