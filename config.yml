@@ -1,0 +1,75 @@
+baseURL: http://www.nvo.one/
+languageCode: en-us
+title: "nathaniel"
+theme: "PaperMod"
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON # necessary for search
+
+taxonomies:
+  category: categories
+  tag: tags
+
+params:
+  comments: true
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: true
+    location: 0
+    distance: 1000
+    threshold: 0.4
+    minMatchCharLength: 1
+    limit: 10 # refer: https://www.fusejs.io/api/methods.html#search
+    keys: ["title", "permalink", "summary", "content"]
+
+  defaultTheme: dark
+  ShowReadingTime: true
+  ShowToc: true
+  TocOpen: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  profileMode:
+        enabled: true
+        title: "Hi stranger \U0001F44B" # optional default will be site title
+        subtitle: "welcome to my IT \U0001F4BB and cloud \U00002601 ranting corner"
+        imageUrl: "/images/stock/grandcanyon4.jpg"
+        imageWidth: 180 # custom size
+        imageHeight: 180 # custom size
+        
+
+  socialIcons:
+    - name: "GitHub"
+      url: https://github.com/nhatvo1502?tab=repositories
+    - name: "Discord"
+      url: https://discordapp.com/users/292528434268340224
+    - name: "Spotify"
+      url: https://open.spotify.com/playlist/0Hg1dUGKzWfEHf7eETZhAO?si=bdef1889cd864ada
+    - name: "Strava"
+      url: https://www.strava.com/athletes/128331132
+  
+
+menu:
+  main:
+    - identifier: about-me
+      name: about me
+      url: /posts/about-me
+      weight: 1
+
+    - identifier: posts
+      name: posts
+      url: /posts
+      weight: 10
+
+    - identifier: categories
+      name: categories
+      url: /categories
+      weight: 20
+
+    - identifier: search
+      name: search
+      url: /posts/search
+      weight: 30
+
