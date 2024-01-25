@@ -1,7 +1,7 @@
 ---
 title: 'Using Google SDM API to control Google Nest Camera'
 date: 2024-01-18T11:55:37-08:00
-draft: true
+draft: false
 author: Nhat Vo
 ---
 

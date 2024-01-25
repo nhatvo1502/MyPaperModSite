@@ -20,7 +20,7 @@
       <link>http://www.nvo.one/posts/002-aws-credential-report/</link>
       <pubDate>Mon, 15 Jan 2024 10:10:29 -0800</pubDate>
       <guid>http://www.nvo.one/posts/002-aws-credential-report/</guid>
-      <description>I. Introduction This project is inspired by one of my dear friends. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It&amp;rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.
+      <description>I. Introduction This project is inspired by one of my dear friend. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It&amp;rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.
 II. Our Game-plan We will leverage Github Action to execute a set of commands to generate AWS Credential Report, download it, decode, pipe the content into csv file and finally copy to a existing S3 bucket.</description>
     </item>
   </channel>

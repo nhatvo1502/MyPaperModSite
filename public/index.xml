@@ -6,8 +6,16 @@
     <description>Recent content on nathaniel</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 16 Jan 2024 11:32:20 -0800</lastBuildDate>
+    <lastBuildDate>Thu, 18 Jan 2024 11:55:37 -0800</lastBuildDate>
     <atom:link href="http://www.nvo.one/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Using Google SDM API to control Google Nest Camera</title>
+      <link>http://www.nvo.one/posts/005-google-sdm/</link>
+      <pubDate>Thu, 18 Jan 2024 11:55:37 -0800</pubDate>
+      <guid>http://www.nvo.one/posts/005-google-sdm/</guid>
+      <description>Project name: Croddy
+Nest Camera Guide: https://developers.google.com/nest/device-access/get-started Register Device Access Accept $5 one time fee https://console.nest.google.com/device-access/ Activate Supported Device Activate and setup device with non-commercial google account Setup Google Cloud Platform Use the link on top of the article, scroll down to Setup Google Cloud Platform and click on Enable the API and Get an OAuth 2.0 Client ID Select Webserver &amp;gt; Enter https://www.google.com &amp;gt; copy Client ID and download the file Create a Device Access project Go to Device Access &amp;gt; Create new project &amp;gt; paste Client ID &amp;gt; disable event Once done, copy Project ID down Now you have to link your developer account with user account</description>
+    </item>
     <item>
       <title>Using Terraform to build AWS network infrastructure and deploy resources</title>
       <link>http://www.nvo.one/posts/004-automate-iac/</link>
@@ -29,7 +37,7 @@ This is an example of phishing emails: Nhat Vo &amp;lt;nhat.vo@123456.com&amp;gt
       <link>http://www.nvo.one/posts/002-aws-credential-report/</link>
       <pubDate>Mon, 15 Jan 2024 10:10:29 -0800</pubDate>
       <guid>http://www.nvo.one/posts/002-aws-credential-report/</guid>
-      <description>I. Introduction This project is inspired by one of my dear friends. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It&amp;rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.
+      <description>I. Introduction This project is inspired by one of my dear friend. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It&amp;rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.
 II. Our Game-plan We will leverage Github Action to execute a set of commands to generate AWS Credential Report, download it, decode, pipe the content into csv file and finally copy to a existing S3 bucket.</description>
     </item>
     <item>
