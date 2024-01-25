@@ -1,0 +1,47 @@
+name: Deploy www.nvo.one
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  Deploy-to-S3:
+    runs-on: ubuntu-latest
+    environment: Dev
+
+    steps:
+      # copy content to runner
+      - name: Checkout
+        run: actions/checkout@v4
+
+
+      # check if path to Public folder
+      - name: get path
+        run: |
+          sudo su
+          pwd command
+
+
+      # Login AWS CLI
+      - name: Verify aws
+        run: aws --version
+
+      - name: Configure AWS Credentials
+        env: 
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'
+        run: |
+          mkdir -p ~/.aws
+          echo "[default]" > ~/.aws/credentials
+          echo "aws_access_key_id=${AWS_ACCESS_KEY_ID}" >> ~/.aws/credentials
+          echo "aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}" >> ~/.aws/credentials
+          echo "region=${AWS_DEFAULT_REGION}" >> ~/.aws/credentials
+      
+      - name: verify aws credential
+        run: aws configure list
+
+
+      # copy Public to website bucket
