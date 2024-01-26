@@ -40,4 +40,7 @@ jobs:
       # Verify path
       - name: verify path
         run: ls
+
       # copy Public to website bucket
+      - name: copy to s3
+        run: aws s3 cp .\public\ s3://www.nvo.one --recursive   
