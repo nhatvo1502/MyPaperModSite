@@ -29,6 +29,9 @@ jobs:
       
       - name: verify aws credential
         run: aws configure list
+      
+      - name: verify s3 permission
+        run: aws s3 ls
 
 
       # copy Public to website bucket
