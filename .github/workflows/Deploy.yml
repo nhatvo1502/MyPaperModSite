@@ -39,6 +39,5 @@ jobs:
       
       # Verify path
       - name: verify path
-        run: echo $PATH
-
+        run: ls
       # copy Public to website bucket
