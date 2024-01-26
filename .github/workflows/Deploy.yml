@@ -9,7 +9,6 @@ on:
 jobs:
   Deploy-to-S3:
     runs-on: ubuntu-latest
-    environment: Dev
 
     steps:
       # Login AWS CLI
