@@ -37,9 +37,13 @@ jobs:
       - name: Checkout file to runner
         uses: actions/checkout@v2
       
-      # Verify path
+      # get folders
       - name: verify path
         run: ls
+
+      # get current path
+      - name: get current path
+        run: pwd command
 
       # copy Public to website bucket
       - name: copy to s3
