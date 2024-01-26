@@ -3,7 +3,7 @@ name: Deploy www.nvo.one
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
