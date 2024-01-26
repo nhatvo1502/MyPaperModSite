@@ -33,5 +33,12 @@ jobs:
       - name: verify s3 permission
         run: aws s3 ls
 
+      # Copy from github to runner
+      - name: Checkout file to runner
+        uses: actions/checkout@v2
+      
+      # Verify path
+      - name: verify path
+        run: echo $PATH
 
       # copy Public to website bucket
