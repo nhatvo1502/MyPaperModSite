@@ -12,18 +12,6 @@ jobs:
     environment: Dev
 
     steps:
-      # copy content to runner
-      - name: Checkout
-        run: actions/checkout@v4
-
-
-      # check if path to Public folder
-      - name: get path
-        run: |
-          sudo su
-          pwd command
-
-
       # Login AWS CLI
       - name: Verify aws
         run: aws --version
