@@ -54,6 +54,7 @@ jobs:
         run: |
           ls
           cd public
+          pwd command
           ls
 
       # get current path
