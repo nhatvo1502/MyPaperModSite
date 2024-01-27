@@ -50,7 +50,9 @@ jobs:
             
       # Install Hugo
       - name: Install Hugo
-        run: sudo apt install hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'v0.121.2'
       
       # Hugo version
       - name: Hugo version
