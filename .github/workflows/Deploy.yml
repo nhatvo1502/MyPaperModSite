@@ -51,7 +51,10 @@ jobs:
       
       # get folders
       - name: verify path
-        run: ls
+        run: |
+          ls
+          cd public
+          ls
 
       # get current path
       - name: get current path
