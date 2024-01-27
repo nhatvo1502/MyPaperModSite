@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Using Terraform to build AWS network infrastructure and deploy resources | nathaniel</title>
+<meta name="keywords" content="">
+<meta name="description" content="1. Source Code https://github.com/nhatvo1502/Automate-IaC/tree/main 2. What the code does 2.1. create-resource.yml configure aws credential verify aws credential verify aws s3 permission create s3 bucket for terraform backend copy file from GH to runner verify terraform file terraform init -&gt; apply 2.2 destroy-resource.yml configure aws credential copy file from GH to runner verify terraform file terraform init -&gt; destroy empty s3 backend bucket delete-bucket 2.3 main.tf configure s3 as backend create an s3 bucket create a keypair using a public key from GitHub Secret AMI lookup create VPC create a subnet create a network interface create EC2 instance 3.">
+<meta name="author" content="Nhat Vo">
+<link rel="canonical" href="http://www.nvo.one/posts/004-automate-iac/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.4599eadb9eb2ad3d0a8d6827b41a8fda8f2f4af226b63466c09c5fddbc8706b7.css" integrity="sha256-RZnq256yrT0KjWgntBqP2o8vSvImtjRmwJxf3byHBrc=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://www.nvo.one/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://www.nvo.one/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://www.nvo.one/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://www.nvo.one/apple-touch-icon.png">
+<link rel="mask-icon" href="http://www.nvo.one/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript><meta property="og:title" content="Using Terraform to build AWS network infrastructure and deploy resources" />
+<meta property="og:description" content="1. Source Code https://github.com/nhatvo1502/Automate-IaC/tree/main 2. What the code does 2.1. create-resource.yml configure aws credential verify aws credential verify aws s3 permission create s3 bucket for terraform backend copy file from GH to runner verify terraform file terraform init -&gt; apply 2.2 destroy-resource.yml configure aws credential copy file from GH to runner verify terraform file terraform init -&gt; destroy empty s3 backend bucket delete-bucket 2.3 main.tf configure s3 as backend create an s3 bucket create a keypair using a public key from GitHub Secret AMI lookup create VPC create a subnet create a network interface create EC2 instance 3." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://www.nvo.one/posts/004-automate-iac/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-01-16T11:32:20-08:00" />
+<meta property="article:modified_time" content="2024-01-16T11:32:20-08:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Using Terraform to build AWS network infrastructure and deploy resources"/>
+<meta name="twitter:description" content="1. Source Code https://github.com/nhatvo1502/Automate-IaC/tree/main 2. What the code does 2.1. create-resource.yml configure aws credential verify aws credential verify aws s3 permission create s3 bucket for terraform backend copy file from GH to runner verify terraform file terraform init -&gt; apply 2.2 destroy-resource.yml configure aws credential copy file from GH to runner verify terraform file terraform init -&gt; destroy empty s3 backend bucket delete-bucket 2.3 main.tf configure s3 as backend create an s3 bucket create a keypair using a public key from GitHub Secret AMI lookup create VPC create a subnet create a network interface create EC2 instance 3."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://www.nvo.one/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Using Terraform to build AWS network infrastructure and deploy resources",
+      "item": "http://www.nvo.one/posts/004-automate-iac/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Using Terraform to build AWS network infrastructure and deploy resources",
+  "name": "Using Terraform to build AWS network infrastructure and deploy resources",
+  "description": "1. Source Code https://github.com/nhatvo1502/Automate-IaC/tree/main 2. What the code does 2.1. create-resource.yml configure aws credential verify aws credential verify aws s3 permission create s3 bucket for terraform backend copy file from GH to runner verify terraform file terraform init -\u0026gt; apply 2.2 destroy-resource.yml configure aws credential copy file from GH to runner verify terraform file terraform init -\u0026gt; destroy empty s3 backend bucket delete-bucket 2.3 main.tf configure s3 as backend create an s3 bucket create a keypair using a public key from GitHub Secret AMI lookup create VPC create a subnet create a network interface create EC2 instance 3.",
+  "keywords": [
+    
+  ],
+  "articleBody": "1. Source Code https://github.com/nhatvo1502/Automate-IaC/tree/main 2. What the code does 2.1. create-resource.yml configure aws credential verify aws credential verify aws s3 permission create s3 bucket for terraform backend copy file from GH to runner verify terraform file terraform init -\u003e apply 2.2 destroy-resource.yml configure aws credential copy file from GH to runner verify terraform file terraform init -\u003e destroy empty s3 backend bucket delete-bucket 2.3 main.tf configure s3 as backend create an s3 bucket create a keypair using a public key from GitHub Secret AMI lookup create VPC create a subnet create a network interface create EC2 instance 3. Setup 3.1 GH clone and repo set You will need to clone my code\ngh repo clone https://github.com/nhatvo1502/Automate-IaC/tree/main When you clone a reposityory, it added as a remote of yours, under the name origin. What you need to do now (as you’re not using the my source anymore) is to rename origin to upstream and add your own origin URL:\ngit remote rename origin upstream git remote add origin http://github.com/YOU/YOUR_REPO Whenever you want to changes from my branch (which is your upstream)\ngit fetch upstream Whenever you want to commit and push to your repository\ngit add *.* git commit -m 'YOUR_MESSAGE' git push 3.2 Github Secrets Create AWS CLI user with Admin Permission https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html Create GitHub Secrets https://docs.github.com/en/codespaces/managing-codespaces-for-your-organization/managing-development-environment-secrets-for-your-repository-or-organization Login to your Github Account \u003e Go to your project Repository \u003e Settings \u003e Under Secrets and variables \u003e Select Actions \u003e Create an environment “Dev” \u003e Create AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY 4. Github Actions 5. GitHub Action runner results: 5.1 Terraform apply Run terraform apply -auto-approve data.aws_ami.ubuntu: Reading... data.aws_ami.ubuntu: Read complete after 0s [id=ami-027a754129abb5386] Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols: + create Terraform will perform the following actions: # aws_instance.new_instance will be created + resource \"aws_instance\" \"new_instance\" { + ami = \"ami-027a754129abb5386\" + arn = (known after apply) + associate_public_ip_address = (known after apply) + availability_zone = (known after apply) + cpu_core_count = (known after apply) + cpu_threads_per_core = (known after apply) + disable_api_stop = (known after apply) + disable_api_termination = (known after apply) + ebs_optimized = (known after apply) + get_password_data = false + host_id = (known after apply) + host_resource_group_arn = (known after apply) + iam_instance_profile = (known after apply) + id = (known after apply) + instance_initiated_shutdown_behavior = (known after apply) + instance_lifecycle = (known after apply) + instance_state = (known after apply) + instance_type = \"t3.micro\" + ipv6_address_count = (known after apply) + ipv6_addresses = (known after apply) + key_name = \"automate-iac-kp\" + monitoring = (known after apply) + outpost_arn = (known after apply) + password_data = (known after apply) + placement_group = (known after apply) + placement_partition_number = (known after apply) + primary_network_interface_id = (known after apply) + private_dns = (known after apply) + private_ip = (known after apply) + public_dns = (known after apply) + public_ip = (known after apply) + secondary_private_ips = (known after apply) + security_groups = (known after apply) + spot_instance_request_id = (known after apply) + subnet_id = (known after apply) + tags = { + \"Name\" = \"automate-iac\" } + tags_all = { + \"Name\" = \"automate-iac\" } + tenancy = (known after apply) + user_data = (known after apply) + user_data_base64 = (known after apply) + user_data_replace_on_change = false + vpc_security_group_ids = (known after apply) + network_interface { + delete_on_termination = false + device_index = 0 + network_card_index = 0 + network_interface_id = (known after apply) } } # aws_key_pair.new_keypair will be created + resource \"aws_key_pair\" \"new_keypair\" { + arn = (known after apply) + fingerprint = (known after apply) + id = (known after apply) + key_name = \"automate-iac-kp\" + key_name_prefix = (known after apply) + key_pair_id = (known after apply) + key_type = (known after apply) + public_key = \"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCJgKe/Ko/3pXldymY2/bwP70xPJzP6NpKS9iQP450sWFtc5VuG3fqaOvGMzhrS3VUseALddYALiWmgf+cgjdvASeW3eIl54y2253QTme4eb1WOZ2/MvcANBuiJFqItL7SR4xlaAuI48yS8lh7L2OIIpzy8PUV+EcPD9KGKsAicFwIDAQAB\" + tags = { + \"Name\" = \"automate-iac\" } + tags_all = { + \"Name\" = \"automate-iac\" } } # aws_network_interface.automate-iac-aws_network_interface will be created + resource \"aws_network_interface\" \"automate-iac-aws_network_interface\" { + arn = (known after apply) + id = (known after apply) + interface_type = (known after apply) + ipv4_prefix_count = (known after apply) + ipv4_prefixes = (known after apply) + ipv6_address_count = (known after apply) + ipv6_address_list = (known after apply) + ipv6_address_list_enabled = false + ipv6_addresses = (known after apply) + ipv6_prefix_count = (known after apply) + ipv6_prefixes = (known after apply) + mac_address = (known after apply) + outpost_arn = (known after apply) + owner_id = (known after apply) + private_dns_name = (known after apply) + private_ip = (known after apply) + private_ip_list = (known after apply) + private_ip_list_enabled = false + private_ips = (known after apply) + private_ips_count = (known after apply) + security_groups = (known after apply) + source_dest_check = true + subnet_id = (known after apply) + tags = { + \"Name\" = \"automate-iac\" } + tags_all = { + \"Name\" = \"automate-iac\" } } # aws_s3_bucket.new_bucket will be created + resource \"aws_s3_bucket\" \"new_bucket\" { + acceleration_status = (known after apply) + acl = (known after apply) + arn = (known after apply) + bucket = \"automate-iac-bucket-123123123\" + bucket_domain_name = (known after apply) + bucket_prefix = (known after apply) + bucket_regional_domain_name = (known after apply) + force_destroy = false + hosted_zone_id = (known after apply) + id = (known after apply) + object_lock_enabled = (known after apply) + policy = (known after apply) + region = (known after apply) + request_payer = (known after apply) + tags_all = (known after apply) + website_domain = (known after apply) + website_endpoint = (known after apply) } # aws_subnet.automate-iac-subnet will be created + resource \"aws_subnet\" \"automate-iac-subnet\" { + arn = (known after apply) + assign_ipv6_address_on_creation = false + availability_zone = \"us-east-1a\" + availability_zone_id = (known after apply) + cidr_block = \"172.16.10.0/24\" + enable_dns64 = false + enable_resource_name_dns_a_record_on_launch = false + enable_resource_name_dns_aaaa_record_on_launch = false + id = (known after apply) + ipv6_cidr_block_association_id = (known after apply) + ipv6_native = false + map_public_ip_on_launch = false + owner_id = (known after apply) + private_dns_hostname_type_on_launch = (known after apply) + tags = { + \"Name\" = \"automate-iac\" } + tags_all = { + \"Name\" = \"automate-iac\" } + vpc_id = (known after apply) } # aws_vpc.automate-iac-vpc will be created + resource \"aws_vpc\" \"automate-iac-vpc\" { + arn = (known after apply) + cidr_block = \"172.16.0.0/16\" + default_network_acl_id = (known after apply) + default_route_table_id = (known after apply) + default_security_group_id = (known after apply) + dhcp_options_id = (known after apply) + enable_dns_hostnames = (known after apply) + enable_dns_support = true + enable_network_address_usage_metrics = (known after apply) + id = (known after apply) + instance_tenancy = \"default\" + ipv6_association_id = (known after apply) + ipv6_cidr_block = (known after apply) + ipv6_cidr_block_network_border_group = (known after apply) + main_route_table_id = (known after apply) + owner_id = (known after apply) + tags = { + \"Name\" = \"automate-iac\" } + tags_all = { + \"Name\" = \"automate-iac\" } } Plan: 6 to add, 0 to change, 0 to destroy. aws_key_pair.new_keypair: Creating... aws_vpc.automate-iac-vpc: Creating... aws_s3_bucket.new_bucket: Creating... aws_key_pair.new_keypair: Creation complete after 0s [id=automate-iac-kp] aws_vpc.automate-iac-vpc: Creation complete after 1s [id=vpc-02606838ac1e89cea] aws_subnet.automate-iac-subnet: Creating... aws_subnet.automate-iac-subnet: Creation complete after 1s [id=subnet-0dbfc00f69e201fa7] aws_network_interface.automate-iac-aws_network_interface: Creating... aws_network_interface.automate-iac-aws_network_interface: Creation complete after 0s [id=eni-0673ed65d965c194e] aws_instance.new_instance: Creating... aws_s3_bucket.new_bucket: Still creating... [10s elapsed] aws_instance.new_instance: Still creating... [10s elapsed] aws_instance.new_instance: Creation complete after 13s [id=i-08a28371557209b0b] aws_s3_bucket.new_bucket: Creation complete after 16s [id=automate-iac-bucket-123123123] Apply complete! Resources: 6 added, 0 changed, 0 destroyed. 5.2 Terraform destroy Run terraform destroy -auto-approve data.aws_ami.ubuntu: Reading... aws_vpc.automate-iac-vpc: Refreshing state... [id=vpc-02606838ac1e89cea] aws_key_pair.new_keypair: Refreshing state... [id=automate-iac-kp] aws_s3_bucket.new_bucket: Refreshing state... [id=automate-iac-bucket-123123123] data.aws_ami.ubuntu: Read complete after 0s [id=ami-027a754129abb5386] aws_subnet.automate-iac-subnet: Refreshing state... [id=subnet-0dbfc00f69e201fa7] aws_network_interface.automate-iac-aws_network_interface: Refreshing state... [id=eni-0673ed65d965c194e] aws_instance.new_instance: Refreshing state... [id=i-08a28371557209b0b] Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols: - destroy Terraform will perform the following actions: # aws_instance.new_instance will be destroyed - resource \"aws_instance\" \"new_instance\" { - ami = \"ami-027a754129abb5386\" -\u003e null - arn = \"arn:aws:ec2:us-east-1:566027688242:instance/i-08a28371557209b0b\" -\u003e null - associate_public_ip_address = false -\u003e null - availability_zone = \"us-east-1a\" -\u003e null - cpu_core_count = 1 -\u003e null - cpu_threads_per_core = 2 -\u003e null - disable_api_stop = false -\u003e null - disable_api_termination = false -\u003e null - ebs_optimized = false -\u003e null - get_password_data = false -\u003e null - hibernation = false -\u003e null - id = \"i-08a28371557209b0b\" -\u003e null - instance_initiated_shutdown_behavior = \"stop\" -\u003e null - instance_state = \"running\" -\u003e null - instance_type = \"t3.micro\" -\u003e null - ipv6_address_count = 0 -\u003e null - ipv6_addresses = [] -\u003e null - key_name = \"automate-iac-kp\" -\u003e null - monitoring = false -\u003e null - placement_partition_number = 0 -\u003e null - primary_network_interface_id = \"eni-0673ed65d965c194e\" -\u003e null - private_dns = \"ip-172-16-10-100.ec2.internal\" -\u003e null - private_ip = \"172.16.10.100\" -\u003e null - secondary_private_ips = [] -\u003e null - security_groups = [] -\u003e null - source_dest_check = true -\u003e null - subnet_id = \"subnet-0dbfc00f69e201fa7\" -\u003e null - tags = { - \"Name\" = \"automate-iac\" } -\u003e null - tags_all = { - \"Name\" = \"automate-iac\" } -\u003e null - tenancy = \"default\" -\u003e null - user_data_replace_on_change = false -\u003e null - vpc_security_group_ids = [ - \"sg-0ce04508e0520a5f7\", ] -\u003e null - capacity_reservation_specification { - capacity_reservation_preference = \"open\" -\u003e null } - cpu_options { - core_count = 1 -\u003e null - threads_per_core = 2 -\u003e null } - credit_specification { - cpu_credits = \"unlimited\" -\u003e null } - enclave_options { - enabled = false -\u003e null } - maintenance_options { - auto_recovery = \"default\" -\u003e null } - metadata_options { - http_endpoint = \"enabled\" -\u003e null - http_protocol_ipv6 = \"disabled\" -\u003e null - http_put_response_hop_limit = 1 -\u003e null - http_tokens = \"optional\" -\u003e null - instance_metadata_tags = \"disabled\" -\u003e null } - network_interface { - delete_on_termination = false -\u003e null - device_index = 0 -\u003e null - network_card_index = 0 -\u003e null - network_interface_id = \"eni-0673ed65d965c194e\" -\u003e null } - private_dns_name_options { - enable_resource_name_dns_a_record = false -\u003e null - enable_resource_name_dns_aaaa_record = false -\u003e null - hostname_type = \"ip-name\" -\u003e null } - root_block_device { - delete_on_termination = true -\u003e null - device_name = \"/dev/sda1\" -\u003e null - encrypted = false -\u003e null - iops = 100 -\u003e null - tags = {} -\u003e null - throughput = 0 -\u003e null - volume_id = \"vol-0a8b14289eb677afa\" -\u003e null - volume_size = 8 -\u003e null - volume_type = \"gp2\" -\u003e null } } # aws_key_pair.new_keypair will be destroyed - resource \"aws_key_pair\" \"new_keypair\" { - arn = \"arn:aws:ec2:us-east-1:566027688242:key-pair/automate-iac-kp\" -\u003e null - fingerprint = \"6f:9d:e0:9f:e1:05:17:47:8c:e0:65:ca:dd:6b:7b:1e\" -\u003e null - id = \"automate-iac-kp\" -\u003e null - key_name = \"automate-iac-kp\" -\u003e null - key_pair_id = \"key-0114ec655b0b831e7\" -\u003e null - key_type = \"rsa\" -\u003e null - public_key = \"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCJgKe/Ko/3pXldymY2/bwP70xPJzP6NpKS9iQP450sWFtc5VuG3fqaOvGMzhrS3VUseALddYALiWmgf+cgjdvASeW3eIl54y2253QTme4eb1WOZ2/MvcANBuiJFqItL7SR4xlaAuI48yS8lh7L2OIIpzy8PUV+EcPD9KGKsAicFwIDAQAB\" -\u003e null - tags = { - \"Name\" = \"automate-iac\" } -\u003e null - tags_all = { - \"Name\" = \"automate-iac\" } -\u003e null } # aws_network_interface.automate-iac-aws_network_interface will be destroyed - resource \"aws_network_interface\" \"automate-iac-aws_network_interface\" { - arn = \"arn:aws:ec2:us-east-1:566027688242:network-interface/eni-0673ed65d965c194e\" -\u003e null - id = \"eni-0673ed65d965c194e\" -\u003e null - interface_type = \"interface\" -\u003e null - ipv4_prefix_count = 0 -\u003e null - ipv4_prefixes = [] -\u003e null - ipv6_address_count = 0 -\u003e null - ipv6_address_list = [] -\u003e null - ipv6_address_list_enabled = false -\u003e null - ipv6_addresses = [] -\u003e null - ipv6_prefix_count = 0 -\u003e null - ipv6_prefixes = [] -\u003e null - mac_address = \"02:27:2b:64:3d:c3\" -\u003e null - owner_id = \"566027688242\" -\u003e null - private_ip = \"172.16.10.100\" -\u003e null - private_ip_list = [ - \"172.16.10.100\", ] -\u003e null - private_ip_list_enabled = false -\u003e null - private_ips = [ - \"172.16.10.100\", ] -\u003e null - private_ips_count = 0 -\u003e null - security_groups = [ - \"sg-0ce04508e0520a5f7\", ] -\u003e null - source_dest_check = true -\u003e null - subnet_id = \"subnet-0dbfc00f69e201fa7\" -\u003e null - tags = { - \"Name\" = \"automate-iac\" } -\u003e null - tags_all = { - \"Name\" = \"automate-iac\" } -\u003e null - attachment { - attachment_id = \"eni-attach-05750a0a2ee7869c5\" -\u003e null - device_index = 0 -\u003e null - instance = \"i-08a28371557209b0b\" -\u003e null } } # aws_s3_bucket.new_bucket will be destroyed - resource \"aws_s3_bucket\" \"new_bucket\" { - arn = \"arn:aws:s3:::automate-iac-bucket-123123123\" -\u003e null - bucket = \"automate-iac-bucket-123123123\" -\u003e null - bucket_domain_name = \"automate-iac-bucket-123123123.s3.amazonaws.com\" -\u003e null - bucket_regional_domain_name = \"automate-iac-bucket-123123123.s3.us-east-1.amazonaws.com\" -\u003e null - force_destroy = false -\u003e null - hosted_zone_id = \"Z3AQBSTGFYJSTF\" -\u003e null - id = \"automate-iac-bucket-123123123\" -\u003e null - object_lock_enabled = false -\u003e null - region = \"us-east-1\" -\u003e null - request_payer = \"BucketOwner\" -\u003e null - tags = {} -\u003e null - tags_all = {} -\u003e null - grant { - id = \"479f57b44641303e6c9a544836dc9b6e50e73a3e558bcb6a2a08f13a3ec6b547\" -\u003e null - permissions = [ - \"FULL_CONTROL\", ] -\u003e null - type = \"CanonicalUser\" -\u003e null } - server_side_encryption_configuration { - rule { - bucket_key_enabled = false -\u003e null - apply_server_side_encryption_by_default { - sse_algorithm = \"AES256\" -\u003e null } } } - versioning { - enabled = false -\u003e null - mfa_delete = false -\u003e null } } # aws_subnet.automate-iac-subnet will be destroyed - resource \"aws_subnet\" \"automate-iac-subnet\" { - arn = \"arn:aws:ec2:us-east-1:566027688242:subnet/subnet-0dbfc00f69e201fa7\" -\u003e null - assign_ipv6_address_on_creation = false -\u003e null - availability_zone = \"us-east-1a\" -\u003e null - availability_zone_id = \"use1-az1\" -\u003e null - cidr_block = \"172.16.10.0/24\" -\u003e null - enable_dns64 = false -\u003e null - enable_lni_at_device_index = 0 -\u003e null - enable_resource_name_dns_a_record_on_launch = false -\u003e null - enable_resource_name_dns_aaaa_record_on_launch = false -\u003e null - id = \"subnet-0dbfc00f69e201fa7\" -\u003e null - ipv6_native = false -\u003e null - map_customer_owned_ip_on_launch = false -\u003e null - map_public_ip_on_launch = false -\u003e null - owner_id = \"566027688242\" -\u003e null - private_dns_hostname_type_on_launch = \"ip-name\" -\u003e null - tags = { - \"Name\" = \"automate-iac\" } -\u003e null - tags_all = { - \"Name\" = \"automate-iac\" } -\u003e null - vpc_id = \"vpc-02606838ac1e89cea\" -\u003e null } # aws_vpc.automate-iac-vpc will be destroyed - resource \"aws_vpc\" \"automate-iac-vpc\" { - arn = \"arn:aws:ec2:us-east-1:566027688242:vpc/vpc-02606838ac1e89cea\" -\u003e null - assign_generated_ipv6_cidr_block = false -\u003e null - cidr_block = \"172.16.0.0/16\" -\u003e null - default_network_acl_id = \"acl-063165fef63bf9e2c\" -\u003e null - default_route_table_id = \"rtb-087a43ef011a55a02\" -\u003e null - default_security_group_id = \"sg-0ce04508e0520a5f7\" -\u003e null - dhcp_options_id = \"dopt-6cefc816\" -\u003e null - enable_dns_hostnames = false -\u003e null - enable_dns_support = true -\u003e null - enable_network_address_usage_metrics = false -\u003e null - id = \"vpc-02606838ac1e89cea\" -\u003e null - instance_tenancy = \"default\" -\u003e null - ipv6_netmask_length = 0 -\u003e null - main_route_table_id = \"rtb-087a43ef011a55a02\" -\u003e null - owner_id = \"566027688242\" -\u003e null - tags = { - \"Name\" = \"automate-iac\" } -\u003e null - tags_all = { - \"Name\" = \"automate-iac\" } -\u003e null } Plan: 0 to add, 0 to change, 6 to destroy. aws_key_pair.new_keypair: Destroying... [id=automate-iac-kp] aws_s3_bucket.new_bucket: Destroying... [id=automate-iac-bucket-123123123] aws_instance.new_instance: Destroying... [id=i-08a28371557209b0b] aws_key_pair.new_keypair: Destruction complete after 0s aws_s3_bucket.new_bucket: Destruction complete after 0s aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 10s elapsed] aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 20s elapsed] aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 30s elapsed] aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 40s elapsed] aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 50s elapsed] aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 1m0s elapsed] aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 1m10s elapsed] aws_instance.new_instance: Destruction complete after 1m10s aws_network_interface.automate-iac-aws_network_interface: Destroying... [id=eni-0673ed65d965c194e] aws_network_interface.automate-iac-aws_network_interface: Destruction complete after 1s aws_subnet.automate-iac-subnet: Destroying... [id=subnet-0dbfc00f69e201fa7] aws_subnet.automate-iac-subnet: Destruction complete after 0s aws_vpc.automate-iac-vpc: Destroying... [id=vpc-02606838ac1e89cea] aws_vpc.automate-iac-vpc: Destruction complete after 0s Destroy complete! Resources: 6 destroyed. ",
+  "wordCount" : "2471",
+  "inLanguage": "en",
+  "datePublished": "2024-01-16T11:32:20-08:00",
+  "dateModified": "2024-01-16T11:32:20-08:00",
+  "author":{
+    "@type": "Person",
+    "name": "Nhat Vo"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://www.nvo.one/posts/004-automate-iac/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "nathaniel",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://www.nvo.one/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class=" dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://www.nvo.one/" accesskey="h" title="nathaniel (Alt + H)">nathaniel</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://www.nvo.one/posts/about-me" title="about me">
+                    <span>about me</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://www.nvo.one/posts" title="posts">
+                    <span>posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://www.nvo.one/categories" title="categories">
+                    <span>categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://www.nvo.one/posts/search" title="search (Alt &#43; /)" accesskey=/>
+                    <span>search</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://www.nvo.one/">Home</a>&nbsp;»&nbsp;<a href="http://www.nvo.one/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Using Terraform to build AWS network infrastructure and deploy resources
+    </h1>
+    <div class="post-meta"><span title='2024-01-16 11:32:20 -0800 PST'>January 16, 2024</span>&nbsp;·&nbsp;12 min&nbsp;·&nbsp;Nhat Vo
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#1-source-code" aria-label="1. Source Code">1. Source Code</a></li>
+                <li>
+                    <a href="#2-what-the-code-does" aria-label="2. What the code does">2. What the code does</a><ul>
+                        
+                <li>
+                    <a href="#21-create-resourceyml" aria-label="2.1. create-resource.yml">2.1. create-resource.yml</a></li>
+                <li>
+                    <a href="#22-destroy-resourceyml" aria-label="2.2 destroy-resource.yml">2.2 destroy-resource.yml</a></li>
+                <li>
+                    <a href="#23-maintf" aria-label="2.3 main.tf">2.3 main.tf</a></li></ul>
+                </li>
+                <li>
+                    <a href="#3-setup" aria-label="3. Setup">3. Setup</a><ul>
+                        
+                <li>
+                    <a href="#31-gh-clone-and-repo-set" aria-label="3.1 GH clone and repo set">3.1 GH clone and repo set</a></li>
+                <li>
+                    <a href="#32-github-secrets" aria-label="3.2 Github Secrets">3.2 Github Secrets</a></li></ul>
+                </li>
+                <li>
+                    <a href="#4-github-actions" aria-label="4. Github Actions">4. Github Actions</a></li>
+                <li>
+                    <a href="#5-github-action-runner-results" aria-label="5. GitHub Action runner results:">5. GitHub Action runner results:</a><ul>
+                        
+                <li>
+                    <a href="#51-terraform-apply" aria-label="5.1 Terraform apply">5.1 Terraform apply</a></li>
+                <li>
+                    <a href="#52-terraform-destroy" aria-label="5.2 Terraform destroy">5.2 Terraform destroy</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h3 id="1-source-code">1. Source Code<a hidden class="anchor" aria-hidden="true" href="#1-source-code">#</a></h3>
+<pre tabindex="0"><code>https://github.com/nhatvo1502/Automate-IaC/tree/main
+</code></pre><h3 id="2-what-the-code-does">2. What the code does<a hidden class="anchor" aria-hidden="true" href="#2-what-the-code-does">#</a></h3>
+<h4 id="21-create-resourceyml">2.1. create-resource.yml<a hidden class="anchor" aria-hidden="true" href="#21-create-resourceyml">#</a></h4>
+<ul>
+<li>configure aws credential
+<ul>
+<li>verify aws credential
+<ul>
+<li>verify aws s3 permission
+<ul>
+<li>create s3 bucket for terraform backend
+<ul>
+<li>copy file from GH to runner
+<ul>
+<li>verify terraform file
+<ul>
+<li>terraform init -&gt; apply</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="22-destroy-resourceyml">2.2 destroy-resource.yml<a hidden class="anchor" aria-hidden="true" href="#22-destroy-resourceyml">#</a></h4>
+<ul>
+<li>configure aws credential
+<ul>
+<li>copy file from GH to runner
+<ul>
+<li>verify terraform file
+<ul>
+<li>terraform init -&gt; destroy
+<ul>
+<li>empty s3 backend bucket
+<ul>
+<li>delete-bucket</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="23-maintf">2.3 main.tf<a hidden class="anchor" aria-hidden="true" href="#23-maintf">#</a></h4>
+<ul>
+<li>configure s3 as backend</li>
+<li>create an s3 bucket</li>
+<li>create a keypair
+<ul>
+<li>using a public key from GitHub Secret</li>
+</ul>
+</li>
+<li>AMI lookup</li>
+<li>create VPC</li>
+<li>create a subnet</li>
+<li>create a network interface</li>
+<li>create EC2 instance</li>
+</ul>
+<h3 id="3-setup">3. Setup<a hidden class="anchor" aria-hidden="true" href="#3-setup">#</a></h3>
+<h4 id="31-gh-clone-and-repo-set">3.1 GH clone and repo set<a hidden class="anchor" aria-hidden="true" href="#31-gh-clone-and-repo-set">#</a></h4>
+<p>You will need to clone my code</p>
+<pre tabindex="0"><code>gh repo clone https://github.com/nhatvo1502/Automate-IaC/tree/main
+</code></pre><p>When you clone a reposityory, it added as a remote of yours, under the name origin. What you need to do now (as you&rsquo;re not using the my source anymore) is to rename origin to upstream and add your own origin URL:</p>
+<pre tabindex="0"><code>git remote rename origin upstream
+git remote add origin http://github.com/YOU/YOUR_REPO
+</code></pre><p>Whenever you want to changes from my branch (which is your upstream)</p>
+<pre tabindex="0"><code>git fetch upstream
+</code></pre><p>Whenever you want to commit and push to your repository</p>
+<pre tabindex="0"><code>git add *.*
+git commit -m &#39;YOUR_MESSAGE&#39;
+git push
+</code></pre><h4 id="32-github-secrets">3.2 Github Secrets<a hidden class="anchor" aria-hidden="true" href="#32-github-secrets">#</a></h4>
+<ul>
+<li>Create AWS CLI user with Admin Permission</li>
+</ul>
+<pre tabindex="0"><code>https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html
+</code></pre><ul>
+<li>Create GitHub Secrets</li>
+</ul>
+<pre tabindex="0"><code>https://docs.github.com/en/codespaces/managing-codespaces-for-your-organization/managing-development-environment-secrets-for-your-repository-or-organization
+</code></pre><p>Login to your Github Account &gt; Go to your project Repository &gt; Settings &gt; Under Secrets and variables &gt; Select Actions &gt; Create an environment &ldquo;Dev&rdquo; &gt; Create AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+<img loading="lazy" src="/images/004/ghsecret1.png" alt="image"  />
+</p>
+<h3 id="4-github-actions">4. Github Actions<a hidden class="anchor" aria-hidden="true" href="#4-github-actions">#</a></h3>
+<p><img loading="lazy" src="/images/004/ghsecret2.png" alt="image"  />
+</p>
+<h3 id="5-github-action-runner-results">5. GitHub Action runner results:<a hidden class="anchor" aria-hidden="true" href="#5-github-action-runner-results">#</a></h3>
+<h4 id="51-terraform-apply">5.1 Terraform apply<a hidden class="anchor" aria-hidden="true" href="#51-terraform-apply">#</a></h4>
+<pre tabindex="0"><code>Run terraform apply -auto-approve
+data.aws_ami.ubuntu: Reading...
+data.aws_ami.ubuntu: Read complete after 0s [id=ami-027a754129abb5386]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_instance.new_instance will be created
+  + resource &#34;aws_instance&#34; &#34;new_instance&#34; {
+      + ami                                  = &#34;ami-027a754129abb5386&#34;
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = (known after apply)
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core              
+         = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = &#34;t3.micro&#34;
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = &#34;automate-iac-kp&#34;
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = (known after apply)
+      + tags                                 = {
+          + &#34;Name&#34; = &#34;automate-iac&#34;
+        }
+      + tags_all                             = {
+          + &#34;Name&#34; = &#34;automate-iac&#34;
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = (known after apply)
+
+      + network_interface {
+          + delete_on_termination = false
+          + device_index          = 0
+          + network_card_index    = 0
+          + network_interface_id  = (known after apply)
+        }
+    }
+
+  # aws_key_pair.new_keypair will be created
+  + resource &#34;aws_key_pair&#34; &#34;new_keypair&#34; {
+      + arn             = (known after apply)
+      + fingerprint     = (known after apply)
+      + id              = (known after apply)
+      + key_name        = &#34;automate-iac-kp&#34;
+      + key_name_prefix = (known after apply)
+      + key_pair_id     = (known after apply)
+      + key_type        = (known after apply)
+      + public_key      = &#34;MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCJgKe/Ko/3pXldymY2/bwP70xPJzP6NpKS9iQP450sWFtc5VuG3fqaOvGMzhrS3VUseALddYALiWmgf+cgjdvASeW3eIl54y2253QTme4eb1WOZ2/MvcANBuiJFqItL7SR4xlaAuI48yS8lh7L2OIIpzy8PUV+EcPD9KGKsAicFwIDAQAB&#34;
+      + tags            = {
+          + &#34;Name&#34; = &#34;automate-iac&#34;
+        }
+      + tags_all        = {
+          + &#34;Name&#34; = &#34;automate-iac&#34;
+        }
+    }
+
+  # aws_network_interface.automate-iac-aws_network_interface will be created
+  + resource &#34;aws_network_interface&#34; &#34;automate-iac-aws_network_interface&#34; {
+      + arn                       = (known after apply)
+      + id                        = (known after apply)
+      + interface_type            = (known after apply)
+      + ipv4_prefix_count         = (known after apply)
+      + ipv4_prefixes             = (known after apply)
+      + ipv6_address_count        = (known after apply)
+      + ipv6_address_list         = (known after apply)
+      + ipv6_address_list_enabled = false
+      + ipv6_addresses            = (known after apply)
+      + ipv6_prefix_count         = (known after apply)
+      + ipv6_prefixes             = (known after apply)
+      + mac_address               = (known after apply)
+      + outpost_arn               = (known after apply)
+      + owner_id                  = (known after apply)
+      + private_dns_name          = (known after apply)
+      + private_ip                = (known after apply)
+      + private_ip_list           = (known after apply)
+      + private_ip_list_enabled   = false
+      + private_ips               = (known after apply)
+      + private_ips_count         = (known after apply)
+      + security_groups           = (known after apply)
+      + source_dest_check         = true
+      + subnet_id                 = (known after apply)
+      + tags                      = {
+          + &#34;Name&#34; = &#34;automate-iac&#34;
+        }
+      + tags_all                  = {
+          + &#34;Name&#34; = &#34;automate-iac&#34;
+        }
+    }
+
+  # aws_s3_bucket.new_bucket will be created
+  + resource &#34;aws_s3_bucket&#34; &#34;new_bucket&#34; {
+      + acceleration_status         = (known after apply)
+      + acl                         = (known after apply)
+      + arn                         = (known after apply)
+      + bucket                      = &#34;automate-iac-bucket-123123123&#34;
+      + bucket_domain_name          = (known after apply)
+      + bucket_prefix               = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = false
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + object_lock_enabled         = (known after apply)
+      + policy                      = (known after apply)
+      + region                      = (known after apply)
+      + request_payer               = (known after apply)
+      + tags_all                    = (known after apply)
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+    }
+
+  # aws_subnet.automate-iac-subnet will be created
+  + resource &#34;aws_subnet&#34; &#34;automate-iac-subnet&#34; {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = &#34;us-east-1a&#34;
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = &#34;172.16.10.0/24&#34;
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + &#34;Name&#34; = &#34;automate-iac&#34;
+        }
+      + tags_all                                       = {
+          + &#34;Name&#34; = &#34;automate-iac&#34;
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # aws_vpc.automate-iac-vpc will be created
+  + resource &#34;aws_vpc&#34; &#34;automate-iac-vpc&#34; {
+      + arn                                  = (known after apply)
+      + cidr_block                           = &#34;172.16.0.0/16&#34;
+      + default_network_acl_id               = (known after apply)
+      + default_route_table_id               = (known after apply)
+      + default_security_group_id            = (known after apply)
+      + dhcp_options_id                      = (known after apply)
+      + enable_dns_hostnames                 = (known after apply)
+      + enable_dns_support                   = true
+      + enable_network_address_usage_metrics = (known after apply)
+      + id                                   = (known after apply)
+      + instance_tenancy                     = &#34;default&#34;
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + tags                                 = {
+          + &#34;Name&#34; = &#34;automate-iac&#34;
+        }
+      + tags_all                             = {
+          + &#34;Name&#34; = &#34;automate-iac&#34;
+        }
+    }
+
+Plan: 6 to add, 0 to change, 0 to destroy.
+aws_key_pair.new_keypair: Creating...
+aws_vpc.automate-iac-vpc: Creating...
+aws_s3_bucket.new_bucket: Creating...
+aws_key_pair.new_keypair: Creation complete after 0s [id=automate-iac-kp]
+aws_vpc.automate-iac-vpc: Creation complete after 1s [id=vpc-02606838ac1e89cea]
+aws_subnet.automate-iac-subnet: Creating...
+aws_subnet.automate-iac-subnet: Creation complete after 1s [id=subnet-0dbfc00f69e201fa7]
+aws_network_interface.automate-iac-aws_network_interface: Creating...
+aws_network_interface.automate-iac-aws_network_interface: Creation complete after 0s [id=eni-0673ed65d965c194e]
+aws_instance.new_instance: Creating...
+aws_s3_bucket.new_bucket: Still creating... [10s elapsed]
+aws_instance.new_instance: Still creating... [10s elapsed]
+aws_instance.new_instance: Creation complete after 13s [id=i-08a28371557209b0b]
+aws_s3_bucket.new_bucket: Creation complete after 16s [id=automate-iac-bucket-123123123]
+
+Apply complete! Resources: 6 added, 0 changed, 0 destroyed.
+</code></pre><h4 id="52-terraform-destroy">5.2 Terraform destroy<a hidden class="anchor" aria-hidden="true" href="#52-terraform-destroy">#</a></h4>
+<pre tabindex="0"><code>Run terraform destroy -auto-approve
+data.aws_ami.ubuntu: Reading...
+aws_vpc.automate-iac-vpc: Refreshing state... [id=vpc-02606838ac1e89cea]
+aws_key_pair.new_keypair: Refreshing state... [id=automate-iac-kp]
+aws_s3_bucket.new_bucket: Refreshing state... [id=automate-iac-bucket-123123123]
+data.aws_ami.ubuntu: Read complete after 0s [id=ami-027a754129abb5386]
+aws_subnet.automate-iac-subnet: Refreshing state... [id=subnet-0dbfc00f69e201fa7]
+aws_network_interface.automate-iac-aws_network_interface: Refreshing state... [id=eni-0673ed65d965c194e]
+aws_instance.new_instance: Refreshing state... [id=i-08a28371557209b0b]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # aws_instance.new_instance will be destroyed
+  - resource &#34;aws_instance&#34; &#34;new_instance&#34; {
+      - ami                                  = &#34;ami-027a754129abb5386&#34; -&gt; null
+      - arn                                  = &#34;arn:aws:ec2:us-east-1:566027688242:instance/i-08a28371557209b0b&#34; -&gt; null
+      - associate_public_ip_address          = false -&gt; null
+      - availability_zone                    = &#34;us-east-1a&#34; -&gt; null
+      - cpu_core_count                       = 1 -&gt; null
+      - cpu_threads_per_core                 = 2 -&gt; null
+      - disable_api_stop                     = false -&gt; null
+      - disable_api_termination              = false -&gt; null
+      - ebs_optimized                        = false -&gt; null
+      - get_password_data                    = false -&gt; null
+      - hibernation                          = false -&gt; null
+      - id                                   = &#34;i-08a28371557209b0b&#34; -&gt; null
+      - instance_initiated_shutdown_behavior = &#34;stop&#34; -&gt; null
+      - instance_state                       = &#34;running&#34; -&gt; null
+      - instance_type                        = &#34;t3.micro&#34; -&gt; null
+      - ipv6_address_count                   = 0 -&gt; null
+      - ipv6_addresses                       = [] -&gt; null
+      - key_name                             = &#34;automate-iac-kp&#34; -&gt; null
+      - monitoring                           = false -&gt; null
+      - placement_partition_number           = 0 -&gt; null
+      - primary_network_interface_id         = &#34;eni-0673ed65d965c194e&#34; -&gt; null
+      - private_dns                          = &#34;ip-172-16-10-100.ec2.internal&#34; -&gt; null
+      - private_ip                           = &#34;172.16.10.100&#34; -&gt; null
+      - secondary_private_ips                = [] -&gt; null
+      - security_groups                      = [] -&gt; null
+      - source_dest_check                    = true -&gt; null
+      - subnet_id                            = &#34;subnet-0dbfc00f69e201fa7&#34; -&gt; null
+      - tags                                 = {
+          - &#34;Name&#34; = &#34;automate-iac&#34;
+        } -&gt; null
+      - tags_all                             = {
+          - &#34;Name&#34; = &#34;automate-iac&#34;
+        } -&gt; null
+      - tenancy                              = &#34;default&#34; -&gt; null
+      - user_data_replace_on_change          = false -&gt; null
+      - vpc_security_group_ids               = [
+          - &#34;sg-0ce04508e0520a5f7&#34;,
+        ] -&gt; null
+
+      - capacity_reservation_specification {
+          - capacity_reservation_preference = &#34;open&#34; -&gt; null
+        }
+
+      - cpu_options {
+          - core_count       = 1 -&gt; null
+          - threads_per_core = 2 -&gt; null
+        }
+
+      - credit_specification {
+          - cpu_credits = &#34;unlimited&#34; -&gt; null
+        }
+
+      - enclave_options {
+          - enabled = false -&gt; null
+        }
+
+      - maintenance_options {
+          - auto_recovery = &#34;default&#34; -&gt; null
+        }
+
+      - metadata_options {
+          - http_endpoint               = &#34;enabled&#34; -&gt; null
+          - http_protocol_ipv6          = &#34;disabled&#34; -&gt; null
+          - http_put_response_hop_limit = 1 -&gt; null
+          - http_tokens                 = &#34;optional&#34; -&gt; null
+          - instance_metadata_tags      = &#34;disabled&#34; -&gt; null
+        }
+
+      - network_interface {
+          - delete_on_termination = false -&gt; null
+          - device_index          = 0 -&gt; null
+          - network_card_index    = 0 -&gt; null
+          - network_interface_id  = &#34;eni-0673ed65d965c194e&#34; -&gt; null
+        }
+
+      - private_dns_name_options {
+          - enable_resource_name_dns_a_record    = false -&gt; null
+          - enable_resource_name_dns_aaaa_record = false -&gt; null
+          - hostname_type                        = &#34;ip-name&#34; -&gt; null
+        }
+
+      - root_block_device {
+          - delete_on_termination = true -&gt; null
+          - device_name           = &#34;/dev/sda1&#34; -&gt; null
+          - encrypted             = false -&gt; null
+          - iops                  = 100 -&gt; null
+          - tags                  = {} -&gt; null
+          - throughput            = 0 -&gt; null
+          - volume_id             = &#34;vol-0a8b14289eb677afa&#34; -&gt; null
+          - volume_size           = 8 -&gt; null
+          - volume_type           = &#34;gp2&#34; -&gt; null
+        }
+    }
+
+  # aws_key_pair.new_keypair will be destroyed
+  - resource &#34;aws_key_pair&#34; &#34;new_keypair&#34; {
+      - arn         = &#34;arn:aws:ec2:us-east-1:566027688242:key-pair/automate-iac-kp&#34; -&gt; null
+      - fingerprint = &#34;6f:9d:e0:9f:e1:05:17:47:8c:e0:65:ca:dd:6b:7b:1e&#34; -&gt; null
+      - id          = &#34;automate-iac-kp&#34; -&gt; null
+      - key_name    = &#34;automate-iac-kp&#34; -&gt; null
+      - key_pair_id = &#34;key-0114ec655b0b831e7&#34; -&gt; null
+      - key_type    = &#34;rsa&#34; -&gt; null
+      - public_key  = &#34;MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCJgKe/Ko/3pXldymY2/bwP70xPJzP6NpKS9iQP450sWFtc5VuG3fqaOvGMzhrS3VUseALddYALiWmgf+cgjdvASeW3eIl54y2253QTme4eb1WOZ2/MvcANBuiJFqItL7SR4xlaAuI48yS8lh7L2OIIpzy8PUV+EcPD9KGKsAicFwIDAQAB&#34; -&gt; null
+      - tags        = {
+          - &#34;Name&#34; = &#34;automate-iac&#34;
+        } -&gt; null
+      - tags_all    = {
+          - &#34;Name&#34; = &#34;automate-iac&#34;
+        } -&gt; null
+    }
+
+  # aws_network_interface.automate-iac-aws_network_interface will be destroyed
+  - resource &#34;aws_network_interface&#34; &#34;automate-iac-aws_network_interface&#34; {
+      - arn                       = &#34;arn:aws:ec2:us-east-1:566027688242:network-interface/eni-0673ed65d965c194e&#34; -&gt; null
+      - id                        = &#34;eni-0673ed65d965c194e&#34; -&gt; null
+      - interface_type            = &#34;interface&#34; -&gt; null
+      - ipv4_prefix_count         = 0 -&gt; null
+      - ipv4_prefixes             = [] -&gt; null
+      - ipv6_address_count        = 0 -&gt; null
+      - ipv6_address_list         = [] -&gt; null
+      - ipv6_address_list_enabled = false -&gt; null
+      - ipv6_addresses            = [] -&gt; null
+      - ipv6_prefix_count         = 0 -&gt; null
+      - ipv6_prefixes             = [] -&gt; null
+      - mac_address               = &#34;02:27:2b:64:3d:c3&#34; -&gt; null
+      - owner_id                  = &#34;566027688242&#34; -&gt; null
+      - private_ip                = &#34;172.16.10.100&#34; -&gt; null
+      - private_ip_list           = [
+          - &#34;172.16.10.100&#34;,
+        ] -&gt; null
+      - private_ip_list_enabled   = false -&gt; null
+      - private_ips               = [
+          - &#34;172.16.10.100&#34;,
+        ] -&gt; null
+      - private_ips_count         = 0 -&gt; null
+      - security_groups           = [
+          - &#34;sg-0ce04508e0520a5f7&#34;,
+        ] -&gt; null
+      - source_dest_check         = true -&gt; null
+      - subnet_id                 = &#34;subnet-0dbfc00f69e201fa7&#34; -&gt; null
+      - tags                      = {
+          - &#34;Name&#34; = &#34;automate-iac&#34;
+        } -&gt; null
+      - tags_all                  = {
+          - &#34;Name&#34; = &#34;automate-iac&#34;
+        } -&gt; null
+
+      - attachment {
+          - attachment_id = &#34;eni-attach-05750a0a2ee7869c5&#34; -&gt; null
+          - device_index  = 0 -&gt; null
+          - instance      = &#34;i-08a28371557209b0b&#34; -&gt; null
+        }
+    }
+
+  # aws_s3_bucket.new_bucket will be destroyed
+  - resource &#34;aws_s3_bucket&#34; &#34;new_bucket&#34; {
+      - arn                         = &#34;arn:aws:s3:::automate-iac-bucket-123123123&#34; -&gt; null
+      - bucket                      = &#34;automate-iac-bucket-123123123&#34; -&gt; null
+      - bucket_domain_name          = &#34;automate-iac-bucket-123123123.s3.amazonaws.com&#34; -&gt; null
+      - bucket_regional_domain_name = &#34;automate-iac-bucket-123123123.s3.us-east-1.amazonaws.com&#34; -&gt; null
+      - force_destroy               = false -&gt; null
+      - hosted_zone_id              = &#34;Z3AQBSTGFYJSTF&#34; -&gt; null
+      - id                          = &#34;automate-iac-bucket-123123123&#34; -&gt; null
+      - object_lock_enabled         = false -&gt; null
+      - region                      = &#34;us-east-1&#34; -&gt; null
+      - request_payer               = &#34;BucketOwner&#34; -&gt; null
+      - tags                        = {} -&gt; null
+      - tags_all                    = {} -&gt; null
+
+      - grant {
+          - id          = &#34;479f57b44641303e6c9a544836dc9b6e50e73a3e558bcb6a2a08f13a3ec6b547&#34; -&gt; null
+          - permissions = [
+              - &#34;FULL_CONTROL&#34;,
+            ] -&gt; null
+          - type        = &#34;CanonicalUser&#34; -&gt; null
+        }
+
+      - server_side_encryption_configuration {
+          - rule {
+              - bucket_key_enabled = false -&gt; null
+
+              - apply_server_side_encryption_by_default {
+                  - sse_algorithm = &#34;AES256&#34; -&gt; null
+                }
+            }
+        }
+
+      - versioning {
+          - enabled    = false -&gt; null
+          - mfa_delete = false -&gt; null
+        }
+    }
+
+  # aws_subnet.automate-iac-subnet will be destroyed
+  - resource &#34;aws_subnet&#34; &#34;automate-iac-subnet&#34; {
+      - arn                                            = &#34;arn:aws:ec2:us-east-1:566027688242:subnet/subnet-0dbfc00f69e201fa7&#34; -&gt; null
+      - assign_ipv6_address_on_creation                = false -&gt; null
+      - availability_zone                              = &#34;us-east-1a&#34; -&gt; null
+      - availability_zone_id                           = &#34;use1-az1&#34; -&gt; null
+      - cidr_block                                     = &#34;172.16.10.0/24&#34; -&gt; null
+      - enable_dns64                                   = false -&gt; null
+      - enable_lni_at_device_index                     = 0 -&gt; null
+      - enable_resource_name_dns_a_record_on_launch    = false -&gt; null
+      - enable_resource_name_dns_aaaa_record_on_launch = false -&gt; null
+      - id                                             = &#34;subnet-0dbfc00f69e201fa7&#34; -&gt; null
+      - ipv6_native                                    = false -&gt; null
+      - map_customer_owned_ip_on_launch                = false -&gt; null
+      - map_public_ip_on_launch                        = false -&gt; null
+      - owner_id                                       = &#34;566027688242&#34; -&gt; null
+      - private_dns_hostname_type_on_launch            = &#34;ip-name&#34; -&gt; null
+      - tags                                           = {
+          - &#34;Name&#34; = &#34;automate-iac&#34;
+        } -&gt; null
+      - tags_all                                       = {
+          - &#34;Name&#34; = &#34;automate-iac&#34;
+        } -&gt; null
+      - vpc_id                                         = &#34;vpc-02606838ac1e89cea&#34; -&gt; null
+    }
+
+  # aws_vpc.automate-iac-vpc will be destroyed
+  - resource &#34;aws_vpc&#34; &#34;automate-iac-vpc&#34; {
+      - arn                                  = &#34;arn:aws:ec2:us-east-1:566027688242:vpc/vpc-02606838ac1e89cea&#34; -&gt; null
+      - assign_generated_ipv6_cidr_block     = false -&gt; null
+      - cidr_block                           = &#34;172.16.0.0/16&#34; -&gt; null
+      - default_network_acl_id               = &#34;acl-063165fef63bf9e2c&#34; -&gt; null
+      - default_route_table_id               = &#34;rtb-087a43ef011a55a02&#34; -&gt; null
+      - default_security_group_id            = &#34;sg-0ce04508e0520a5f7&#34; -&gt; null
+      - dhcp_options_id                      = &#34;dopt-6cefc816&#34; -&gt; null
+      - enable_dns_hostnames                 = false -&gt; null
+      - enable_dns_support                   = true -&gt; null
+      - enable_network_address_usage_metrics = false -&gt; null
+      - id                                   = &#34;vpc-02606838ac1e89cea&#34; -&gt; null
+      - instance_tenancy                     = &#34;default&#34; -&gt; null
+      - ipv6_netmask_length                  = 0 -&gt; null
+      - main_route_table_id                  = &#34;rtb-087a43ef011a55a02&#34; -&gt; null
+      - owner_id                             = &#34;566027688242&#34; -&gt; null
+      - tags                                 = {
+          - &#34;Name&#34; = &#34;automate-iac&#34;
+        } -&gt; null
+      - tags_all                             = {
+          - &#34;Name&#34; = &#34;automate-iac&#34;
+        } -&gt; null
+    }
+
+Plan: 0 to add, 0 to change, 6 to destroy.
+aws_key_pair.new_keypair: Destroying... [id=automate-iac-kp]
+aws_s3_bucket.new_bucket: Destroying... [id=automate-iac-bucket-123123123]
+aws_instance.new_instance: Destroying... [id=i-08a28371557209b0b]
+aws_key_pair.new_keypair: Destruction complete after 0s
+aws_s3_bucket.new_bucket: Destruction complete after 0s
+aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 10s elapsed]
+aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 20s elapsed]
+aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 30s elapsed]
+aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 40s elapsed]
+aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 50s elapsed]
+aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 1m0s elapsed]
+aws_instance.new_instance: Still destroying... [id=i-08a28371557209b0b, 1m10s elapsed]
+aws_instance.new_instance: Destruction complete after 1m10s
+aws_network_interface.automate-iac-aws_network_interface: Destroying... [id=eni-0673ed65d965c194e]
+aws_network_interface.automate-iac-aws_network_interface: Destruction complete after 1s
+aws_subnet.automate-iac-subnet: Destroying... [id=subnet-0dbfc00f69e201fa7]
+aws_subnet.automate-iac-subnet: Destruction complete after 0s
+aws_vpc.automate-iac-vpc: Destroying... [id=vpc-02606838ac1e89cea]
+aws_vpc.automate-iac-vpc: Destruction complete after 0s
+
+Destroy complete! Resources: 6 destroyed.
+</code></pre>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer><div id="disqus_thread"></div>
+<script>
+    
+
+    
+
+    (function() { 
+    var d = document, s = d.createElement('script');
+    s.src = 'https://www-nvo-one.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2024 <a href="http://www.nvo.one/">nathaniel</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -37,29 +37,26 @@ jobs:
       - name: Checkout file to runner
         uses: actions/checkout@v2
 
-      # Verify path
-      - name: Get current path
-        run: pwd command
+      # Verify runner's content
+      - name: Verify runner's content
+        run: ls
 
       # Install Hugo
       - name: Install Hugo
         run: sudo apt install hugo
 
       # Verify Hugo version
-      - name: Verify hugo
+      - name: Generate Public folder
         run: hugo
       
       # get folders
-      - name: verify path
+      - name: Verify Path
         run: |
+          pwd command
           ls
           cd public
           pwd command
           ls
-
-      # get current path
-      - name: get current path
-        run: pwd command
 
       # copy Public to website bucket
       - name: copy to s3

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Learn on nathaniel</title>
+    <link>http://www.nvo.one/categories/learn/</link>
+    <description>Recent content in Learn on nathaniel</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 16 Jan 2024 09:26:03 -0800</lastBuildDate>
+    <atom:link href="http://www.nvo.one/categories/learn/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Avoid Phishing and Malicious Emails in 2024</title>
+      <link>http://www.nvo.one/posts/003-phishing-email/</link>
+      <pubDate>Tue, 16 Jan 2024 09:26:03 -0800</pubDate>
+      <guid>http://www.nvo.one/posts/003-phishing-email/</guid>
+      <description>1. Verify sender&amp;rsquo;s email address The sender&amp;rsquo;s origin contains 2 parts: The display name and email@domain.com.
+Nhat Vo &amp;lt;nhat.vo@awakenservices.net&amp;gt; Display name: Nhat Vo Email address: nhat.vo@awakenservices.net The display name can be forged while email address cannot.
+This is an example of phishing emails: Nhat Vo &amp;lt;nhat.vo@123456.com&amp;gt; Display name: Nhat Vo Email address: nhat.vo@12345.com 2. Don&amp;rsquo;t Trust Unsolicited Emails Be cautious of unexpected emails, especially those requesting personal information or urging you to click on links.</description>
+    </item>
+  </channel>
+</rss>
