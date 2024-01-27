@@ -37,7 +37,7 @@ jobs:
       - name: Checkout file to runner
         uses: actions/checkout@v4
         with: 
-          submodules: "true"
+          submodules: recursive
 
       # Verify runner's content
       - name: Verify runner's content
