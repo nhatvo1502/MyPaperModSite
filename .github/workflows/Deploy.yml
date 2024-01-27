@@ -44,12 +44,17 @@ jobs:
       # Install Hugo
       - name: Install Hugo
         run: sudo apt install hugo
+      
+      # Install Papermod theme
+      - name: Install Papermod Theme
+        run: git clone https://github.com/adityatelange/hugo-PaperMod themes/PaperMod --depth=1
 
-      # Verify Hugo version
+      # Genrate Public folder
       - name: Generate Public folder
         run: |
           pwd command
           hugo --destination public
+      
       
       # get folders
       - name: Verify Path

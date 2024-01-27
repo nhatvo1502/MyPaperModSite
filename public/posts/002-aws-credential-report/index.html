@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Using Github Action to generate AWS Credential Report | nathaniel</title>
+<meta name="keywords" content="">
+<meta name="description" content="I. Introduction This project is inspired by one of my dear friend. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It&rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.
+II. Our Game-plan We will leverage Github Action to execute a set of commands to generate AWS Credential Report, download it, decode, pipe the content into csv file and finally copy to a existing S3 bucket.">
+<meta name="author" content="">
+<link rel="canonical" href="http://www.nvo.one/posts/002-aws-credential-report/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.4599eadb9eb2ad3d0a8d6827b41a8fda8f2f4af226b63466c09c5fddbc8706b7.css" integrity="sha256-RZnq256yrT0KjWgntBqP2o8vSvImtjRmwJxf3byHBrc=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://www.nvo.one/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://www.nvo.one/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://www.nvo.one/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://www.nvo.one/apple-touch-icon.png">
+<link rel="mask-icon" href="http://www.nvo.one/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript><meta property="og:title" content="Using Github Action to generate AWS Credential Report" />
+<meta property="og:description" content="I. Introduction This project is inspired by one of my dear friend. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It&rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.
+II. Our Game-plan We will leverage Github Action to execute a set of commands to generate AWS Credential Report, download it, decode, pipe the content into csv file and finally copy to a existing S3 bucket." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://www.nvo.one/posts/002-aws-credential-report/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-01-15T10:10:29-08:00" />
+<meta property="article:modified_time" content="2024-01-15T10:10:29-08:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Using Github Action to generate AWS Credential Report"/>
+<meta name="twitter:description" content="I. Introduction This project is inspired by one of my dear friend. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It&rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.
+II. Our Game-plan We will leverage Github Action to execute a set of commands to generate AWS Credential Report, download it, decode, pipe the content into csv file and finally copy to a existing S3 bucket."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://www.nvo.one/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Using Github Action to generate AWS Credential Report",
+      "item": "http://www.nvo.one/posts/002-aws-credential-report/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Using Github Action to generate AWS Credential Report",
+  "name": "Using Github Action to generate AWS Credential Report",
+  "description": "I. Introduction This project is inspired by one of my dear friend. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It\u0026rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.\nII. Our Game-plan We will leverage Github Action to execute a set of commands to generate AWS Credential Report, download it, decode, pipe the content into csv file and finally copy to a existing S3 bucket.",
+  "keywords": [
+    
+  ],
+  "articleBody": "I. Introduction This project is inspired by one of my dear friend. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It’s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.\nII. Our Game-plan We will leverage Github Action to execute a set of commands to generate AWS Credential Report, download it, decode, pipe the content into csv file and finally copy to a existing S3 bucket.\nTools that we need for this project:\nAWS CLI https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html GitHub CLI https://cli.github.com/ III. Create an AWS CLI user + proper permission Steps:\nCreate custom IAM policy on AWS Console Create CLI user Attach the custom IAM Policy to CLI user Create a CLI Access Key Confiure AWS Credential on local terminal What permission do you need?\n- Generate Credential Report iam:GenerateCredentialReport\n- Download Credential Report iam:GetCredentialReport\n- Write to S3 S3:PutObject\n- List S3 bucket S3:GetPbject\n1. Create custom IAM policy on AWS Console:\nAWS Console \u003e IAM \u003e Under Access management \u003e Policies Copy and paste the following JSON policy to the policy editor. You can also create a seperate policy for S3:PutObject where it target one of your bucket.\n{ \"Version\": \"2012-10-17\", \"Statement\": [ { \"Sid\": \"VisualEditor0\", \"Effect\": \"Allow\", \"Action\": [ \"iam:GenerateCredentialReport\", \"s3:PutObject\", \"iam:GetCredentialReport\", \"s3:GetObject\" ], \"Resource\": \"*\" } ] } 2. Create CLI user Create a CLI user via AWS Console \u003e IAM \u003e Under Access management \u003e Users \u003e Create user 3. Attach the custom IAM Policy to CLI user Select CLI User \u003e Under Permissions \u003e Permissions policies \u003e Add permission \u003e Select our custom policies 4. Create a CLI Access Key Select CLI User in AWS Console \u003e Security credentials Under Access keys \u003e Create access key \u003e Select Command Line Interface (CLI) \u003e tick the box Confirmation \u003e Next \u003e Create access key\nNote down the Access key and Secret access key, you will need these later 5. Confiure AWS Credential on local terminal\nGo to local terminal or Ctrl + Shift +` in vscode to open terminal (my default terminal is PowerShell) \u003e enter this command\naws configure Copy and paste your CLI user access key\nCopy and paste your CLI user secret access key\nEnter default region (mine is us-west-1)\nEnter default format (mine is json)\nVerify your input by entering this command\naws configure list IV. GitHub Steps:\nCreate Github account from their website if you don’t have one ready Create a repository Create secret environment Create AWS access key and secret access key secrets 1. Create Github account from their website if you don’t have one ready\nGo to their website and sign-up\nhttps://github.com/ 2. Create a repository\nYou can create a new repo from Github web console or using CLI: Login\ngh auth login Create new repo\ngh repo create If you create repo from web, make sure to clone it to your local\ngh repo clone 3. Create Github Action AWS Secrets\nGo to github.com \u003e Your project repository \u003e Settings \u003e under Security \u003e Secrets and variables \u003e Actions\nNew Environment \u003e Create environment name Dev \u003e Click on Dev\nAdd secret \u003e Name it AWS_ACCESS_KEY_ID \u003e Copy and paste your CLI Access Key from the note\nAdd secret \u003e Name it AWS_SECRET_ACCESS_KEY \u003e Copy and paste your CLI Secret Access Key from the note\nV. VSCODE extension** I use VSCode along with these extensions GitHub Action will support syntax for yml file.\nVI. Github Action Steps:\nCreate .github/workflows Create yaml files Configure yaml files Code explains Commit to Github Test 1. Create .github/workflows\nGo to the repo folder and create this folder structure\nmkdir .github cd .github mkdir workflows Create action.yml\nIt should look like this\n3. Configure yaml files\nOpen action.yml using vscode\nCopy and paste this code block\nname: Automate Credential Report on: # trigger manually workflow_dispatch: jobs: generate-export-credential-report: runs-on: ubuntu-latest environment: Dev steps: - name: Verify aws run: aws --version - name: Configure AWS Credentials env: AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_DEFAULT_REGION: 'us-east-1' run: | mkdir -p ~/.aws echo \"[default]\" \u003e ~/.aws/credentials echo \"aws_access_key_id=${AWS_ACCESS_KEY_ID}\" \u003e\u003e ~/.aws/credentials echo \"aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}\" \u003e\u003e ~/.aws/credentials echo \"region=${AWS_DEFAULT_REGION}\" \u003e\u003e ~/.aws/credentials - name: Verify AWS Credential run: aws configure list - name: Verify s3 permission run: aws s3 ls - name: Generate Credential Report run: aws iam generate-credential-report - name: Wait for 5 second run: sleep 5 - name: Retrieve report run: report_content=$(aws iam get-credential-report --query 'Content' --output text) - name: Decode report run: report_text=$(echo \"$report_content\" | base64 -d) - name: Save report to csv file run: echo \"$report_text\" \u003e credential-report.csv - name: Copy the report to s3 run: aws s3 cp ./credential-report.csv s3://keypair-1234 4. Code explains\nWe will start with giving this action a name name: Automate Credential Report The on code block will determine the trigger condition, in this case, work_dispatch mean manual trigger. Read more on on: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions on: workflow_dispatch The jobs structure should be jobs: build: runs-on: *The machine that you want the jobs to be ran on, we call it runner* environment: *Environment to store our secret on git hub* steps: - name: *Name of each step run: *bash command* Using this understanding, it will translate our code above into jobs: generate-export-credential-report: *our build name* runs-on: ubuntu-latest *running on abuntu with latest update* environment: Dev *Our Github secret environment Dev* All ubuntu-latest on github action pre-installed with AWS CLI, we just want to verify if this is true by verify aws version - name: Verify aws run: aws --version Login AWS CLI user to this runner using AWS Access Key and Secret Access Key that we have saved into our note above. Instead of writing our secret key to the yml, we will be passing it from our Github secret environment which I will be showing in a bit. - name: Configure AWS Credentials env: AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_DEFAULT_REGION: 'us-east-1' run: | mkdir -p ~/.aws echo \"[default]\" \u003e ~/.aws/credentials echo \"aws_access_key_id=${AWS_ACCESS_KEY_ID}\" \u003e\u003e ~/.aws/credentials echo \"aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}\" \u003e\u003e ~/.aws/credentials echo \"region=${AWS_DEFAULT_REGION}\" \u003e\u003e ~/.aws/credentials Verify our credential - name: Verify AWS Credential run: aws configure list This step is optional since I only include S3:PutObject in the policy. To be able to verify if we have permision to s3, we also need S3:GetObject. - name: Verify s3 permission run: aws s3 ls Generate AWS Credential Report - name: Generate Credential Report run: aws iam generate-credential-report Sleep for 5 to make sure the AWS finish generate the report before we can download, if we try to download right after generate, there is a chance the report has not yet been created therefore the script will timeout - name: Wait for 5 second run: sleep 5 Download the report into a variable report_content - name: Retrieve report run: report_content=$(aws iam get-credential-report --query 'Content' --output text) Since the content we just downloaded is encrypted Base64, we need to decode it - name: Decode report run: report_text=$(echo \"$report_content\" | base64 -d) Save it as csv file - name: Save report to csv file run: echo \"$report_text\" \u003e credential-report.csv Then copy it to S3 - name: Copy the report to s3 run: aws s3 cp ./credential-report.csv s3://keypair-1234 5. Commit to Github\nEnter this command to commit the code to github\ngit add *.* git commit -m 'my first commit' git push Go to github.com \u003e your repo and check if your code is there\nGo to Actions tab \u003e if the folder structure .github/workflows/action.yml was done right, you should see this Drop down Run workflow button \u003e Run workflow \u003e Click onto the workflow and see all the steps are executing in real time If all the steps are succesfully executed \u003e go to AWS Console \u003e S3 \u003e your bucket \u003e you should see your report Download it and open with excel to see if the decoding works\n",
+  "wordCount" : "1327",
+  "inLanguage": "en",
+  "datePublished": "2024-01-15T10:10:29-08:00",
+  "dateModified": "2024-01-15T10:10:29-08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://www.nvo.one/posts/002-aws-credential-report/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "nathaniel",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://www.nvo.one/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class=" dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://www.nvo.one/" accesskey="h" title="nathaniel (Alt + H)">nathaniel</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://www.nvo.one/posts/about-me" title="about me">
+                    <span>about me</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://www.nvo.one/posts" title="posts">
+                    <span>posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://www.nvo.one/categories" title="categories">
+                    <span>categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://www.nvo.one/posts/search" title="search (Alt &#43; /)" accesskey=/>
+                    <span>search</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://www.nvo.one/">Home</a>&nbsp;»&nbsp;<a href="http://www.nvo.one/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Using Github Action to generate AWS Credential Report
+    </h1>
+    <div class="post-meta"><span title='2024-01-15 10:10:29 -0800 PST'>January 15, 2024</span>&nbsp;·&nbsp;7 min
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#i-introduction" aria-label="I. Introduction">I. Introduction</a></li>
+                <li>
+                    <a href="#ii-our-game-plan" aria-label="II. Our Game-plan">II. Our Game-plan</a></li>
+                <li>
+                    <a href="#iii-create-an-aws-cli-user--proper-permission" aria-label="III. Create an AWS CLI user &#43; proper permission">III. Create an AWS CLI user + proper permission</a></li>
+                <li>
+                    <a href="#iv-github" aria-label="IV. GitHub">IV. GitHub</a></li>
+                <li>
+                    <a href="#v-vscode-extension" aria-label="V. VSCODE extension**">V. VSCODE extension**</a></li>
+                <li>
+                    <a href="#vi-github-action" aria-label="VI. Github Action">VI. Github Action</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="i-introduction">I. Introduction<a hidden class="anchor" aria-hidden="true" href="#i-introduction">#</a></h2>
+<p>This project is inspired by one of my dear friend. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It&rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.</p>
+<h2 id="ii-our-game-plan">II. Our Game-plan<a hidden class="anchor" aria-hidden="true" href="#ii-our-game-plan">#</a></h2>
+<p><img loading="lazy" src="/images/aws-credential-report/game-plan.png" alt="image"  />
+
+We will leverage Github Action to execute a set of commands to generate AWS Credential Report, download it, decode, pipe the content into csv file and finally copy to a existing S3 bucket.</p>
+<p>Tools that we need for this project:</p>
+<ol>
+<li>AWS CLI</li>
+</ol>
+<pre tabindex="0"><code>https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+</code></pre><ol start="2">
+<li>GitHub CLI</li>
+</ol>
+<pre tabindex="0"><code>https://cli.github.com/
+</code></pre><h2 id="iii-create-an-aws-cli-user--proper-permission">III. Create an AWS CLI user + proper permission<a hidden class="anchor" aria-hidden="true" href="#iii-create-an-aws-cli-user--proper-permission">#</a></h2>
+<p>Steps:</p>
+<ol>
+<li>Create custom IAM policy on AWS Console</li>
+<li>Create CLI user</li>
+<li>Attach the custom IAM Policy to CLI user</li>
+<li>Create a CLI Access Key</li>
+<li>Confiure AWS Credential on local terminal</li>
+</ol>
+<p><em>What permission do you need?</em><br>
+<em>- Generate Credential Report <strong>iam:GenerateCredentialReport</strong></em><br>
+<em>- Download Credential Report <strong>iam:GetCredentialReport</strong></em><br>
+<em>- Write to S3 <strong>S3:PutObject</strong></em><br>
+<em>- List S3 bucket <strong>S3:GetPbject</strong></em></p>
+<p><em><strong>1. Create custom IAM policy on AWS Console:</strong></em><br>
+AWS Console &gt; IAM &gt; Under Access management &gt; Policies
+<img loading="lazy" src="/images/aws-credential-report/AWS_Permission_group.png" alt="image"  />
+</p>
+<p>Copy and paste the following JSON policy to the policy editor. You can also create a seperate policy for S3:PutObject where it target one of your bucket.</p>
+<pre tabindex="0"><code>{
+	&#34;Version&#34;: &#34;2012-10-17&#34;,
+	&#34;Statement&#34;: [
+		{
+			&#34;Sid&#34;: &#34;VisualEditor0&#34;,
+			&#34;Effect&#34;: &#34;Allow&#34;,
+			&#34;Action&#34;: [
+                          &#34;iam:GenerateCredentialReport&#34;,
+                          &#34;s3:PutObject&#34;,
+                          &#34;iam:GetCredentialReport&#34;,
+                          &#34;s3:GetObject&#34;
+			],
+			&#34;Resource&#34;: &#34;*&#34;
+		}
+	]
+}
+</code></pre><p><em><strong>2. Create CLI user</strong></em>
+Create a CLI user via AWS Console &gt; IAM &gt; Under Access management &gt; Users &gt; Create user
+<img loading="lazy" src="/images/aws-credential-report/aws-create-user.png" alt="image"  />
+</p>
+<p><em><strong>3. Attach the custom IAM Policy to CLI user</strong></em>
+Select CLI User &gt; Under Permissions &gt; Permissions policies &gt; Add permission &gt; Select our custom policies
+<img loading="lazy" src="/images/aws-credential-report/policy.png" alt="image"  />
+</p>
+<p><em><strong>4. Create a CLI Access Key</strong></em>
+Select CLI User in AWS Console &gt; Security credentials Under Access keys &gt; Create access key &gt; Select Command Line Interface (CLI) &gt; tick the box Confirmation &gt; Next &gt; Create access key<br>
+Note down the Access key and Secret access key, you will need these later
+<img loading="lazy" src="/images/aws-credential-report/accesskey.png" alt="image"  />
+</p>
+<p><em><strong>5. Confiure AWS Credential on local terminal</strong></em><br>
+Go to local terminal or Ctrl + Shift +` in vscode to open terminal (my default terminal is PowerShell) &gt; enter this command</p>
+<pre tabindex="0"><code>aws configure
+</code></pre><ul>
+<li>
+<p>Copy and paste your CLI user access key</p>
+</li>
+<li>
+<p>Copy and paste your CLI user secret access key</p>
+</li>
+<li>
+<p>Enter default region (mine is us-west-1)</p>
+</li>
+<li>
+<p>Enter default format (mine is json)</p>
+</li>
+<li>
+<p>Verify your input by entering this command</p>
+</li>
+</ul>
+<pre tabindex="0"><code>aws configure list
+</code></pre><p><img loading="lazy" src="/images/aws-credential-report/aws-configure-list.png" alt="image"  />
+</p>
+<h2 id="iv-github">IV. GitHub<a hidden class="anchor" aria-hidden="true" href="#iv-github">#</a></h2>
+<p>Steps:</p>
+<ol>
+<li>Create Github account from their website if you don&rsquo;t have one ready</li>
+<li>Create a repository</li>
+<li>Create secret environment</li>
+<li>Create AWS access key and secret access key secrets</li>
+</ol>
+<p><em><strong>1. Create Github account from their website if you don&rsquo;t have one ready</strong></em></p>
+<p>Go to their website and sign-up</p>
+<pre tabindex="0"><code>https://github.com/
+</code></pre><p><em><strong>2. Create a repository</strong></em></p>
+<p>You can create a new repo from Github web console or using CLI:
+Login</p>
+<pre tabindex="0"><code>gh auth login
+</code></pre><p>Create new repo</p>
+<pre tabindex="0"><code>gh repo create
+</code></pre><p>If you create repo from web, make sure to clone it to your local</p>
+<pre tabindex="0"><code>gh repo clone
+</code></pre><p><em><strong>3. Create Github Action AWS Secrets</strong></em></p>
+<p>Go to github.com &gt; Your project repository &gt; Settings &gt; under Security &gt; Secrets and variables &gt; Actions</p>
+<p>New Environment &gt; Create environment name Dev &gt; Click on Dev</p>
+<p>Add secret &gt; Name it <em><strong>AWS_ACCESS_KEY_ID</strong></em> &gt; Copy and paste your CLI Access Key from the note</p>
+<p>Add secret &gt; Name it <em><strong>AWS_SECRET_ACCESS_KEY</strong></em> &gt; Copy and paste your CLI Secret Access Key from the note</p>
+<p><img loading="lazy" src="/images/aws-credential-report/gh-action-secrets.png" alt="image"  />
+</p>
+<h2 id="v-vscode-extension">V. VSCODE extension**<a hidden class="anchor" aria-hidden="true" href="#v-vscode-extension">#</a></h2>
+<p>I use VSCode along with these extensions <img loading="lazy" src="/images/aws-credential-report/github-action.png" alt="image"  />
+</p>
+<p><strong>GitHub Action</strong> will support syntax for yml file.</p>
+<h2 id="vi-github-action">VI. Github Action<a hidden class="anchor" aria-hidden="true" href="#vi-github-action">#</a></h2>
+<p>Steps:</p>
+<ol>
+<li>Create .github/workflows</li>
+<li>Create yaml files</li>
+<li>Configure yaml files</li>
+<li>Code explains</li>
+<li>Commit to Github</li>
+<li>Test</li>
+</ol>
+<p><em><strong>1. Create .github/workflows</strong></em></p>
+<p>Go to the repo folder and create this folder structure</p>
+<pre tabindex="0"><code>mkdir .github
+cd .github
+mkdir workflows
+</code></pre><p>Create action.yml<br>
+It should look like this<br>
+<img loading="lazy" src="/images/aws-credential-report/folder-structure.png" alt="image"  />
+</p>
+<p><em><strong>3. Configure yaml files</strong></em></p>
+<p>Open action.yml using vscode</p>
+<p>Copy and paste this code block</p>
+<pre tabindex="0"><code>name: Automate Credential Report
+on:
+  # trigger manually
+  workflow_dispatch:
+
+jobs:
+  generate-export-credential-report:
+    runs-on: ubuntu-latest
+    environment: Dev
+
+    steps:
+      - name: Verify aws
+        run: aws --version
+
+      - name: Configure AWS Credentials
+        env: 
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: &#39;us-east-1&#39;
+        run: |
+          mkdir -p ~/.aws
+          echo &#34;[default]&#34; &gt; ~/.aws/credentials
+          echo &#34;aws_access_key_id=${AWS_ACCESS_KEY_ID}&#34; &gt;&gt; ~/.aws/credentials
+          echo &#34;aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}&#34; &gt;&gt; ~/.aws/credentials
+          echo &#34;region=${AWS_DEFAULT_REGION}&#34; &gt;&gt; ~/.aws/credentials
+      
+      - name: Verify AWS Credential
+        run: aws configure list
+
+      - name: Verify s3 permission
+        run: aws s3 ls
+      
+      - name: Generate Credential Report
+        run: aws iam generate-credential-report
+      
+      - name: Wait for 5 second
+        run: sleep 5
+      
+      - name: Retrieve report
+        run: report_content=$(aws iam get-credential-report --query &#39;Content&#39; --output text)
+      
+      - name: Decode report
+        run: report_text=$(echo &#34;$report_content&#34; | base64 -d)
+      
+      - name: Save report to csv file
+        run: echo &#34;$report_text&#34; &gt; credential-report.csv
+      
+      - name: Copy the report to s3
+        run: aws s3 cp ./credential-report.csv s3://keypair-1234
+</code></pre><p><em><strong>4. Code explains</strong></em></p>
+<ul>
+<li>We will start with giving this action a name</li>
+</ul>
+<pre tabindex="0"><code>name: Automate Credential Report
+</code></pre><ul>
+<li>The <em><strong>on</strong></em> code block will determine the trigger condition, in this case, <em><strong>work_dispatch</strong></em> mean manual trigger. Read more on on:</li>
+</ul>
+<pre tabindex="0"><code>https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+</code></pre><pre tabindex="0"><code>on:
+    workflow_dispatch
+</code></pre><ul>
+<li>The jobs structure should be</li>
+</ul>
+<pre tabindex="0"><code>jobs:
+    build:
+        runs-on: *The machine that you want the jobs to be ran on, we call it runner*
+        environment: *Environment to store our secret on git hub*
+
+        steps:
+            - name: *Name of each step
+              run: *bash command*
+</code></pre><ul>
+<li>Using this understanding, it will translate our code above into</li>
+</ul>
+<pre tabindex="0"><code>jobs:
+  generate-export-credential-report: *our build name*
+    runs-on: ubuntu-latest *running on abuntu with latest update*
+    environment: Dev *Our Github secret environment Dev*
+</code></pre><ul>
+<li>All ubuntu-latest on github action pre-installed with AWS CLI, we just want to verify if this is true by verify aws version</li>
+</ul>
+<pre tabindex="0"><code>- name: Verify aws
+        run: aws --version
+</code></pre><ul>
+<li>Login AWS CLI user to this runner using AWS Access Key and Secret Access Key that we have saved into our note above. Instead of writing our secret key to the yml, we will be passing it from our Github secret environment which I will be showing in a bit.</li>
+</ul>
+<pre tabindex="0"><code>- name: Configure AWS Credentials
+        env: 
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: &#39;us-east-1&#39;
+        run: |
+          mkdir -p ~/.aws
+          echo &#34;[default]&#34; &gt; ~/.aws/credentials
+          echo &#34;aws_access_key_id=${AWS_ACCESS_KEY_ID}&#34; &gt;&gt; ~/.aws/credentials
+          echo &#34;aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}&#34; &gt;&gt; ~/.aws/credentials
+          echo &#34;region=${AWS_DEFAULT_REGION}&#34; &gt;&gt; ~/.aws/credentials
+</code></pre><ul>
+<li>Verify our credential</li>
+</ul>
+<pre tabindex="0"><code>- name: Verify AWS Credential
+        run: aws configure list
+</code></pre><ul>
+<li>This step is optional since I only include S3:PutObject in the policy. To be able to verify if we have permision to s3, we also need S3:GetObject.</li>
+</ul>
+<pre tabindex="0"><code>- name: Verify s3 permission
+        run: aws s3 ls
+</code></pre><ul>
+<li>Generate AWS Credential Report</li>
+</ul>
+<pre tabindex="0"><code>- name: Generate Credential Report
+  run: aws iam generate-credential-report
+</code></pre><ul>
+<li>Sleep for 5 to make sure the AWS finish generate the report before we can download, if we try to download right after generate, there is a chance the report has not yet been created therefore the script will timeout</li>
+</ul>
+<pre tabindex="0"><code>- name: Wait for 5 second
+  run: sleep 5
+</code></pre><ul>
+<li>Download the report into a variable <em><strong>report_content</strong></em></li>
+</ul>
+<pre tabindex="0"><code>- name: Retrieve report
+  run: report_content=$(aws iam get-credential-report --query &#39;Content&#39; --output text)
+</code></pre><ul>
+<li>Since the content we just downloaded is encrypted Base64, we need to decode it</li>
+</ul>
+<pre tabindex="0"><code>- name: Decode report
+  run: report_text=$(echo &#34;$report_content&#34; | base64 -d)
+</code></pre><ul>
+<li>Save it as csv file</li>
+</ul>
+<pre tabindex="0"><code>- name: Save report to csv file
+  run: echo &#34;$report_text&#34; &gt; credential-report.csv
+</code></pre><ul>
+<li>Then copy it to S3</li>
+</ul>
+<pre tabindex="0"><code>- name: Copy the report to s3
+  run: aws s3 cp ./credential-report.csv s3://keypair-1234
+</code></pre><p><em><strong>5. Commit to Github</strong></em></p>
+<p>Enter this command to commit the code to github</p>
+<pre tabindex="0"><code>git add *.*
+git commit -m &#39;my first commit&#39;
+git push
+</code></pre><p>Go to github.com &gt; your repo and check if your code is there</p>
+<p>Go to Actions tab &gt; if the folder structure .github/workflows/action.yml was done right, you should see this
+<img loading="lazy" src="/images/aws-credential-report/gh-action1.png" alt="image"  />
+</p>
+<p>Drop down Run workflow button &gt; Run workflow &gt; Click onto the workflow and see all the steps are executing in real time
+<img loading="lazy" src="/images/aws-credential-report/gh-action2.png" alt="image"  />
+</p>
+<p>If all the steps are succesfully executed &gt; go to AWS Console &gt; S3 &gt; your bucket &gt; you should see your report
+<img loading="lazy" src="/images/aws-credential-report/report-s3.png" alt="image"  />
+</p>
+<p>Download it and open with excel to see if the decoding works</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer><div id="disqus_thread"></div>
+<script>
+    
+
+    
+
+    (function() { 
+    var d = document, s = d.createElement('script');
+    s.src = 'https://www-nvo-one.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2024 <a href="http://www.nvo.one/">nathaniel</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

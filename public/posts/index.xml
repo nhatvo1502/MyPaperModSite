@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on nathaniel</title>
+    <link>http://www.nvo.one/posts/</link>
+    <description>Recent content in Posts on nathaniel</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 18 Jan 2024 11:55:37 -0800</lastBuildDate>
+    <atom:link href="http://www.nvo.one/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Using Google SDM API to control Google Nest Camera</title>
+      <link>http://www.nvo.one/posts/005-google-sdm/</link>
+      <pubDate>Thu, 18 Jan 2024 11:55:37 -0800</pubDate>
+      <guid>http://www.nvo.one/posts/005-google-sdm/</guid>
+      <description>Project name: Croddy
+Nest Camera Guide: https://developers.google.com/nest/device-access/get-started Register Device Access Accept $5 one time fee https://console.nest.google.com/device-access/ Activate Supported Device Activate and setup device with non-commercial google account Setup Google Cloud Platform Use the link on top of the article, scroll down to Setup Google Cloud Platform and click on Enable the API and Get an OAuth 2.0 Client ID Select Webserver &amp;gt; Enter https://www.google.com &amp;gt; copy Client ID and download the file Create a Device Access project Go to Device Access &amp;gt; Create new project &amp;gt; paste Client ID &amp;gt; disable event Once done, copy Project ID down Now you have to link your developer account with user account</description>
+    </item>
+    <item>
+      <title>Using Terraform to build AWS network infrastructure and deploy resources</title>
+      <link>http://www.nvo.one/posts/004-automate-iac/</link>
+      <pubDate>Tue, 16 Jan 2024 11:32:20 -0800</pubDate>
+      <guid>http://www.nvo.one/posts/004-automate-iac/</guid>
+      <description>1. Source Code https://github.com/nhatvo1502/Automate-IaC/tree/main 2. What the code does 2.1. create-resource.yml configure aws credential verify aws credential verify aws s3 permission create s3 bucket for terraform backend copy file from GH to runner verify terraform file terraform init -&amp;gt; apply 2.2 destroy-resource.yml configure aws credential copy file from GH to runner verify terraform file terraform init -&amp;gt; destroy empty s3 backend bucket delete-bucket 2.3 main.tf configure s3 as backend create an s3 bucket create a keypair using a public key from GitHub Secret AMI lookup create VPC create a subnet create a network interface create EC2 instance 3.</description>
+    </item>
+    <item>
+      <title>Avoid Phishing and Malicious Emails in 2024</title>
+      <link>http://www.nvo.one/posts/003-phishing-email/</link>
+      <pubDate>Tue, 16 Jan 2024 09:26:03 -0800</pubDate>
+      <guid>http://www.nvo.one/posts/003-phishing-email/</guid>
+      <description>1. Verify sender&amp;rsquo;s email address The sender&amp;rsquo;s origin contains 2 parts: The display name and email@domain.com.
+Nhat Vo &amp;lt;nhat.vo@awakenservices.net&amp;gt; Display name: Nhat Vo Email address: nhat.vo@awakenservices.net The display name can be forged while email address cannot.
+This is an example of phishing emails: Nhat Vo &amp;lt;nhat.vo@123456.com&amp;gt; Display name: Nhat Vo Email address: nhat.vo@12345.com 2. Don&amp;rsquo;t Trust Unsolicited Emails Be cautious of unexpected emails, especially those requesting personal information or urging you to click on links.</description>
+    </item>
+    <item>
+      <title>Using Github Action to generate AWS Credential Report</title>
+      <link>http://www.nvo.one/posts/002-aws-credential-report/</link>
+      <pubDate>Mon, 15 Jan 2024 10:10:29 -0800</pubDate>
+      <guid>http://www.nvo.one/posts/002-aws-credential-report/</guid>
+      <description>I. Introduction This project is inspired by one of my dear friend. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It&amp;rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.
+II. Our Game-plan We will leverage Github Action to execute a set of commands to generate AWS Credential Report, download it, decode, pipe the content into csv file and finally copy to a existing S3 bucket.</description>
+    </item>
+    <item>
+      <title>About Me</title>
+      <link>http://www.nvo.one/posts/about-me/</link>
+      <pubDate>Mon, 08 Jan 2024 16:40:52 -0800</pubDate>
+      <guid>http://www.nvo.one/posts/about-me/</guid>
+      <description>Hi, my name is Nhat Vo. I&amp;rsquo;m an IT Officer and off-seasoned Software Dev with a keen interest in cloud technology (especially AWS). This blog will be my jounal where I would write about my personal cloud projects and anything IT related.
+When I&amp;rsquo;m away from the keyboard, I like to tinker with my car and travel with my favorite people.
+Thank you for visiting
+NV</description>
+    </item>
+  </channel>
+</rss>
