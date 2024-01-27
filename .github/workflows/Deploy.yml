@@ -69,7 +69,7 @@ jobs:
         run: |
           pwd command
           ls -la
-          ls -la ./themes
+          ls -la ./themes/PaperMod
           cd public
           pwd command
           ls -la
