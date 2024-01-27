@@ -36,6 +36,14 @@ jobs:
       # Copy from github to runner
       - name: Checkout file to runner
         uses: actions/checkout@v2
+
+      # Install Hugo
+      - name: Install Hugo
+        run: sudo apt install hugo
+
+      # Verify Hugo version
+      - name: Verify hugo
+        run: hugo
       
       # get folders
       - name: verify path
@@ -46,5 +54,5 @@ jobs:
         run: pwd command
 
       # copy Public to website bucket
-      - name: copy to s3
-        run: aws s3 cp ~/work/MyPaperModSite/MyPaperModSite/public s3://www.nvo.one --recursive   
+      #- name: copy to s3
+      #  run: aws s3 cp ~/work/MyPaperModSite/MyPaperModSite/public s3://www.nvo.one --recursive   
