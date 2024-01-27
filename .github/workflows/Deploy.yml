@@ -40,17 +40,22 @@ jobs:
       # Verify runner's content
       - name: Verify runner's content
         run: ls -a
-
+      
+      # Install Dart Sass
+      - name: Install Dart Sass
+        run: |
+          sudo snap install dart-sass
+            
       # Install Hugo
       - name: Install Hugo
         run: sudo apt install hugo
       
       # Install Papermod theme
-      - name: Install Papermod Theme
-        run: |
-          mkdir theme
-          git submodule add -f --depth=1 https://github.com/adityatelange/hugo-PaperMod.git themes/PaperMod
-          git submodule update --init --recursive # needed when you reclone your repo (submodules may not get cloned automatically)
+      #- name: Install Papermod Theme
+      #  run: |
+      #    mkdir theme
+      #    git submodule add -f --depth=1 https://github.com/adityatelange/hugo-PaperMod.git themes/PaperMod
+      #    git submodule update --init --recursive # needed when you reclone your repo (submodules may not get cloned automatically)
 
       # Genrate Public folder
       - name: Generate Public folder
