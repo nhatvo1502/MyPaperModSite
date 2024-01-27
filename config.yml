@@ -33,7 +33,7 @@ params:
   ShowCodeCopyButtons: true
   profileMode:
         enabled: true
-        title: "Hi stranger!!! \U0001F44B" # optional default will be site title
+        title: "Hi stranger \U0001F44B" # optional default will be site title
         subtitle: "welcome to my IT \U0001F4BB and cloud \U00002601 ranting corner"
         imageUrl: "/images/stock/grandcanyon4.jpg"
         imageWidth: 180 # custom size
