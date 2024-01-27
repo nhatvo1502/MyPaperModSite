@@ -47,16 +47,18 @@ jobs:
 
       # Verify Hugo version
       - name: Generate Public folder
-        run: hugo
+        run: |
+          pwd command
+          hugo --destination public
       
       # get folders
       - name: Verify Path
         run: |
           pwd command
-          ls
+          ls -la
           cd public
           pwd command
-          ls
+          ls -la
 
       # copy Public to website bucket
       - name: copy to s3
