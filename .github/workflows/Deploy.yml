@@ -48,7 +48,7 @@ jobs:
       # Install Papermod theme
       - name: Install Papermod Theme
         run: |
-          mkdir themes -f
+          mkdir theme
           git submodule add -f --depth=1 https://github.com/adityatelange/hugo-PaperMod.git themes/PaperMod
           git submodule update --init --recursive # needed when you reclone your repo (submodules may not get cloned automatically)
 
