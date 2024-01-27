@@ -11,10 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Login AWS CLI
-      - name: Verify aws
-        run: aws --version
-
+      # Configure AWS Credentials
       - name: Configure AWS Credentials
         env: 
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -27,61 +24,22 @@ jobs:
           echo "aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}" >> ~/.aws/credentials
           echo "region=${AWS_DEFAULT_REGION}" >> ~/.aws/credentials
       
-      - name: verify aws credential
-        run: aws configure list
-      
-      - name: verify s3 permission
-        run: aws s3 ls
-
       # Copy from github to runner
       - name: Checkout file to runner
         uses: actions/checkout@v4
         with: 
           submodules: recursive
-
-      # Verify runner's content
-      - name: Verify runner's content
-        run: ls -a
-      
-      # Install Dart Sass
-      - name: Install Dart Sass
-        run: |
-          sudo snap install dart-sass
             
       # Install Hugo
       - name: Install Hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: ' 0.122.0'
-      
-      # Hugo version
-      - name: Hugo version
-        run: hugo version
-      
-      # Install Papermod theme
-      #- name: Install Papermod Theme
-      #  run: |
-      #    mkdir theme
-      #    git submodule add -f --depth=1 https://github.com/adityatelange/hugo-PaperMod.git themes/PaperMod
-      #    git submodule update --init --recursive # needed when you reclone your repo (submodules may not get cloned automatically)
 
-      # Genrate Public folder
+      # Make Public
       - name: Generate Public folder
-        run: |
-          pwd command
-          hugo --destination public
-      
-      
-      # get folders
-      - name: Verify Path
-        run: |
-          pwd command
-          ls -la
-          ls -la ./themes/PaperMod
-          cd public
-          pwd command
-          ls -la
-
+        run: hugo --destination public
+        
       # copy Public to website bucket
       - name: copy to s3
         run: aws s3 cp ~/work/MyPaperModSite/MyPaperModSite/public s3://www.nvo.one --recursive   
