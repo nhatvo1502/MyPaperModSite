@@ -14,7 +14,12 @@ taxonomies:
   tag: tags
 
 params:
-  languageCode: en-us
+  languages:
+    us:
+      languageCode: en-US
+      languageDirection: ltr
+      languageName: English
+      weight: 1
   comments: true
   fuseOpts:
     isCaseSensitive: false
