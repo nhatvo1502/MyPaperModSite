@@ -52,6 +52,10 @@ jobs:
       - name: Install Hugo
         run: sudo apt install hugo
       
+      # Hugo version
+      - name: Hugo version
+        run: hugo version
+      
       # Install Papermod theme
       #- name: Install Papermod Theme
       #  run: |
