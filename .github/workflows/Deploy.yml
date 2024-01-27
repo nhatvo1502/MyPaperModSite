@@ -54,5 +54,5 @@ jobs:
         run: pwd command
 
       # copy Public to website bucket
-      #- name: copy to s3
-      #  run: aws s3 cp ~/work/MyPaperModSite/MyPaperModSite/public s3://www.nvo.one --recursive   
+      - name: copy to s3
+        run: aws s3 cp ~/work/MyPaperModSite/MyPaperModSite/public s3://www.nvo.one --recursive   
