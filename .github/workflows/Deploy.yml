@@ -69,6 +69,7 @@ jobs:
         run: |
           pwd command
           ls -la
+          ls -la /themes
           cd public
           pwd command
           ls -la
