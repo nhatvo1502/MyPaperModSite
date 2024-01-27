@@ -39,7 +39,7 @@ jobs:
 
       # Verify runner's content
       - name: Verify runner's content
-        run: ls
+        run: ls -a
 
       # Install Hugo
       - name: Install Hugo
