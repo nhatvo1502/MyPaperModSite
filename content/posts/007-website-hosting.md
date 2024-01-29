@@ -1,6 +1,6 @@
 ---
 title: 'How I host my website on AWS using Domain from Godaddy.com'
-date: 2024-01-29T11:16:33-08:00
+date: 2024-01-29T11:13:33-08:00
 draft: false
 author: Nhat Vo
 ---
