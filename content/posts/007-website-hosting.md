@@ -1,17 +1,15 @@
 ---
 title: 'How I host my website on AWS using Domain from Godaddy.com'
 date: 2024-01-29T11:16:33-08:00
-draft: true
+draft: false
 author: Nhat Vo
 ---
 
 # Intro
-
+![image](/images/007/Drawing8.png)
 
 # Step 1: Purchase my first domain
 At first, I planned to buy my first domain from AWS but they don't support *.one* so I bought from GoDaddy.com.
-
-*godaddy1.png*
 
 # Step 2: Update Domain Nameserver with AWS Route53 generated NS
 
