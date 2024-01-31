@@ -6,16 +6,22 @@ author: Nhat Vo
 ---
 
 # Intro
+My goal is to host a website that is secure, cheap and can be browsed from both subdomain (with www.) and root domain (without wwww.). I bought my first domain name from GoDaddy and I choose AWS for hosting.
+
 ![image](/images/007/Drawing8.png)
 
 # Step 1: Purchase my first domain
-At first, I planned to buy my first domain from AWS but they don't support *.one* so I bought from GoDaddy.com.
 
-# Step 2: Update Domain Nameserver with AWS Route53 generated NS
+At first, I tried to purchase from AWS but Route53 doesn't support *.one*. Here is a list of all top-level domains that AWS support. 
+>https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/registrar-tld-list.html
 
-Since the domain that I bought from Godaddy.com is currently using the nameservers from Godaddy.com. I would need to update these NS, so that any traffic to my domain **nvo.one** will be routed to my AWS CloudFront.
+Having a domain on GoDaddy and hosting on AWS meaning I have to update their Nameservers.
 
-## Generate AWS NS Records
+# Step 2: Route53 NameServers
+
+First, I will to create a Route53 Hosted Zone. By default, AWS will provide four NameServers with a NS Record. Then, I can use these NameServers to update on GoDaddy Domain.
+
+## Route53 new Hosted Zone
 1. Sign in to **AWS Management Console** and navigate to Route53.
 2. On the left panel, select **Hosted zones**.
 3. Choose **Create hosted zone**.
@@ -25,7 +31,7 @@ Since the domain that I bought from Godaddy.com is currently using the nameserve
 7. Choose **Create Hosted Zone**
 8. Route53 will automatically create a new set of NS with 4 records, I left this tab open and will come back to copy these value for the next step.
 
-## Update my domain NS Record
+## Update GoDaddy Domain's NS
 1. Sign in to Godaddy.com console
 2. Choose the "Nine dots" next to my Profile to expand the nav menu.
 3. Choose **Domains**
@@ -35,7 +41,7 @@ Since the domain that I bought from Godaddy.com is currently using the nameserve
 7. Godaddy asks for my confirmation by replacing the Nameservers record, it will remove Godaddy NS, choose **Yes**
 8. I go back to my AWS Route53 from the previous tab to copy each NS Records and paste in GoDaddy console. By default,GoDaddy only provide 2 NS records. I increase these number of records to 4 to match with what AWS Route53 provides.
 
-# Step 3: Request a public certificate
+# Step 3: Request a SSL certificate
 
 My website will requires a public certificate in order for Amazon CloudFront distributions to configure CloudFront to require viewers use HTTPS so that connections are encrypted when CoudFront communicate with viewers.
 
