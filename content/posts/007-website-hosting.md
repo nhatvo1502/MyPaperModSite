@@ -11,10 +11,15 @@ My goal is to host a website that is secure, cheap and can be browsed from both 
 ![image](/images/007/Drawing8.png)
 
 # Step 1: Purchase my first domain
+<<<<<<< HEAD
+=======
+At first, I planned to buy my first domain from AWS but they don't support *.one* so I bought from GoDaddy instead. I will need to update its Nameservers records (NS) in GoDaddy console as an extra step compares to buying directly from AWS registra which I don't have to.
+>>>>>>> 43da9d11b966d91175a7889627c188fd56f3f4a4
 
 At first, I tried to purchase from AWS but Route53 doesn't support *.one*. Here is a list of all top-level domains that AWS support. 
 >https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/registrar-tld-list.html
 
+<<<<<<< HEAD
 Having a domain on GoDaddy and hosting on AWS meaning I have to update their Nameservers.
 
 # Step 2: Route53 NameServers
@@ -22,6 +27,11 @@ Having a domain on GoDaddy and hosting on AWS meaning I have to update their Nam
 First, I will to create a Route53 Hosted Zone. By default, AWS will provide four NameServers with a NS Record. Then, I can use these NameServers to update on GoDaddy Domain.
 
 ## Route53 new Hosted Zone
+=======
+When we first buy a domain from GoDaddy, by default, GoDaddy will provides 2 default NS records that point to GoDaddy server. Since I'm going to use AWS Route53, I will modify my domain NS.
+
+## First, I need to generate new AWS NameServers from Route53
+>>>>>>> 43da9d11b966d91175a7889627c188fd56f3f4a4
 1. Sign in to **AWS Management Console** and navigate to Route53.
 2. On the left panel, select **Hosted zones**.
 3. Choose **Create hosted zone**.
@@ -31,7 +41,11 @@ First, I will to create a Route53 Hosted Zone. By default, AWS will provide four
 7. Choose **Create Hosted Zone**
 8. Route53 will automatically create a new set of NS with 4 records, I left this tab open and will come back to copy these value for the next step.
 
+<<<<<<< HEAD
 ## Update GoDaddy Domain's NS
+=======
+## Then, use the AWS's NS and put them in my domain's NS
+>>>>>>> 43da9d11b966d91175a7889627c188fd56f3f4a4
 1. Sign in to Godaddy.com console
 2. Choose the "Nine dots" next to my Profile to expand the nav menu.
 3. Choose **Domains**
@@ -45,7 +59,7 @@ First, I will to create a Route53 Hosted Zone. By default, AWS will provide four
 
 My website will requires a public certificate in order for Amazon CloudFront distributions to configure CloudFront to require viewers use HTTPS so that connections are encrypted when CoudFront communicate with viewers.
 
-CloudFront can only use certificate created in US East (N. Virginia) Region. If you create a certificate and later set up CloudFront and your CloudFront couldn't find it, there is a good change your certificate was created in a region which is not US East. Forunately, AWS Certification is free and easy to create. Here is how I create mine:
+CloudFront can only use certificate created in US East (N. Virginia) Region. If I create a SSL Certification in any region which is not US East, my CloudFront distribution won't be able to adopt the SSL certifications. Here is how I create my free - AWS provided SSL Certification
 
 1. Sign in to **AWS Management Console** and navigate to **ACM**
 2. On the left panel, select **Request certificate**
@@ -59,6 +73,7 @@ CloudFront can only use certificate created in US East (N. Virginia) Region. If 
 10. It took less than 30' to verify my domain, and the status will change to **Issued** when it's ready to be used.
 
 # Step 4: Create and Set Up S3 bucket
+I will need 2 buckets: one is for my subdomain www.nvo.one which will contains my static webside, and another one for my root nvo.one which will point to my subdomain bucket.
 
 ## Create and Set Up my sub-domain bucket
 I need to create a bucket to store my static website content
@@ -91,7 +106,8 @@ I need to create a bucket to store my static website content
 
 ## Create and Set Up your root domain
 
-I also want my users to be able to browse to my website without typing *www.*, I need to create another bucket to response to this request and redirect the users to my S3 bucket where the content is at.
+The purpose of this bucket is to allow users to be able to browse to my website without typing *www.*, I need to create another bucket to response to this request and redirect the users to my S3 bucket where the content is at.
+
 1. Create bucket
 2. Name it **nvo.one** (without ***www.***)
 3. Choose Properties
@@ -103,9 +119,9 @@ I also want my users to be able to browse to my website without typing *www.*, I
 
 # Step 5: Create an Amazon CloudFront distribution for my subdomain www.nvo.one
 
-CloudFront is a Content Delivery Network service from AWS (CDN) that I use to improve traffic speed from user to my website and also enable HTTPS so people can view it securely. I would need to create one for subdomain S3 bucket and one for my root S3 bucket
+I will need to also 2 CloudFront distribution: one for subdomain and one for root where they both using my SSL Certification.
 
-## For subdomain
+## Subdomain distribution
 1. Sign in to **AWS Management Console** and navigate to CloudFront.
 2. Choose **Create Distribution**.
 3. Under **Origin**, for **Origin domain**, I choose my Amazon S3 bucket that I created for my subdomain (ww.nvo.one).\
@@ -117,7 +133,7 @@ CloudFront is a Content Delivery Network service from AWS (CDN) that I use to im
 - I leave everything else default and choose **Create distribution**
 6. Once the distribution created, I monitor the **Status** column, it will takes sometimes to change from **In progress** to **Deployed** where CloudFront will distribute my website to the world. How excited!
 
-## For root
+## Root domain distribution
 I also want my root domain is distributed CDN to the world to server all the request to my root and of course the response will be redirected from my root bucket.
 
 1. Sign in to **AWS Management Console** and navigate to CloudFront
@@ -134,7 +150,7 @@ I also want my root domain is distributed CDN to the world to server all the req
 
 # Step 6: Route DNS traffic from my Domain name to my CloudFront distributions
 
-Up to this point, I have a working domain name that is ready to be accessed by the world and 2 CloudFront distributions which are ready to distribute my content (nvo.one and www.nvo.one). I need to "connect" (route the traffic) together via Route53.
+As of now, I should have **a working domain name that is ready to be accessed by the world** and **2 CloudFront distributions which are ready to distribute my content (nvo.one and www.nvo.one)**. Next, I need to create a record for each of the distribution group to Route53 Hosted Zone where my domain name is using the same NS records.
 
 ## For subdomain
 1. Sign in to **AWS Management Console** and navigate to Route53
@@ -164,4 +180,16 @@ Up to this point, I have a working domain name that is ready to be accessed by t
 11. For **Evaluate target health**, I choose **No**.
 12. Choose **Define simple record**.
 
+# Step 7: FAQ
+## Invalidation
+There are often a few times after updating my subdomain bucket, my website doesn't really update. Invalidation would help clear out the cache at AWS's edge location and force the edge location to pull from our S3 bucket again. This will guarantee user will see the updates immediately. But it will result a small charge which can accumulate over the time. 
+
+Which will leads to another question that how can I know that my bucket already receive the update and will display it correctly before the edge location TTL runs out and sync up. By using S3 Static Web Hosting endpoint.
+
+## S3 Static Web Hosting endpoint
+Once the new update is copied to the S3 bucket, one way that we can see how to website looks like even before it will be pull to the CloudFront Edge's location is to use Statuc Web Hosting endpoint. 
+1. Sign to **AWS Management Console**, navigate to **S3**
+2. Choose to subdomain buckets (www.nvo.one)
+3. Choose **Properties**, scroll to the end
+4. Copy the **Static Web Hosting endpoints** and paste it into any browser
 
