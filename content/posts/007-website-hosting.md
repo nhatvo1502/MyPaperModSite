@@ -11,15 +11,13 @@ My goal is to host a website that is secure, cheap and can be browsed from both 
 ![image](/images/007/Drawing8.png)
 
 # Step 1: Purchase my first domain
-<<<<<<< HEAD
-=======
+
 At first, I planned to buy my first domain from AWS but they don't support *.one* so I bought from GoDaddy instead. I will need to update its Nameservers records (NS) in GoDaddy console as an extra step compares to buying directly from AWS registra which I don't have to.
 >>>>>>> 43da9d11b966d91175a7889627c188fd56f3f4a4
 
 At first, I tried to purchase from AWS but Route53 doesn't support *.one*. Here is a list of all top-level domains that AWS support. 
 >https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/registrar-tld-list.html
 
-<<<<<<< HEAD
 Having a domain on GoDaddy and hosting on AWS meaning I have to update their Nameservers.
 
 # Step 2: Route53 NameServers
@@ -31,7 +29,6 @@ First, I will to create a Route53 Hosted Zone. By default, AWS will provide four
 When we first buy a domain from GoDaddy, by default, GoDaddy will provides 2 default NS records that point to GoDaddy server. Since I'm going to use AWS Route53, I will modify my domain NS.
 
 ## First, I need to generate new AWS NameServers from Route53
->>>>>>> 43da9d11b966d91175a7889627c188fd56f3f4a4
 1. Sign in to **AWS Management Console** and navigate to Route53.
 2. On the left panel, select **Hosted zones**.
 3. Choose **Create hosted zone**.
@@ -41,11 +38,9 @@ When we first buy a domain from GoDaddy, by default, GoDaddy will provides 2 def
 7. Choose **Create Hosted Zone**
 8. Route53 will automatically create a new set of NS with 4 records, I left this tab open and will come back to copy these value for the next step.
 
-<<<<<<< HEAD
 ## Update GoDaddy Domain's NS
 =======
 ## Then, use the AWS's NS and put them in my domain's NS
->>>>>>> 43da9d11b966d91175a7889627c188fd56f3f4a4
 1. Sign in to Godaddy.com console
 2. Choose the "Nine dots" next to my Profile to expand the nav menu.
 3. Choose **Domains**
