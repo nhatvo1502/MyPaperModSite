@@ -13,7 +13,6 @@ My goal is to host a website that is secure, cheap and can be browsed from both 
 # Step 1: Purchase my first domain
 
 At first, I planned to buy my first domain from AWS but they don't support *.one* so I bought from GoDaddy instead. I will need to update its Nameservers records (NS) in GoDaddy console as an extra step compares to buying directly from AWS registra which I don't have to.
->>>>>>> 43da9d11b966d91175a7889627c188fd56f3f4a4
 
 At first, I tried to purchase from AWS but Route53 doesn't support *.one*. Here is a list of all top-level domains that AWS support. 
 >https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/registrar-tld-list.html
