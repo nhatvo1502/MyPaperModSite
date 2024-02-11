@@ -10,7 +10,7 @@ Hi, my name is Nhat Vo. I'm an IT Officer and off-seasoned Software Dev with a k
 
 When I'm away from the keyboard, I like to tinker with my car and travel with my favorite people.
 
-Thank you for visiting
+Thank you for visiting!
 
 NV
 
