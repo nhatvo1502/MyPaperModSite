@@ -1,5 +1,5 @@
 ---
-title: 'Using Github Action to generate AWS Credential Report'
+title: 'get aws credential report using github action'
 date: 2024-01-15T10:10:29-08:00
 draft: false
 categories:
