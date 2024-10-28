@@ -42,4 +42,8 @@ jobs:
         
       # copy Public to website bucket
       - name: copy to s3
-        run: aws s3 cp ~/work/MyPaperModSite/MyPaperModSite/public s3://www.nvo.one --recursive   
+        run: aws s3 cp ~/work/MyPaperModSite/MyPaperModSite/public s3://www.nvo.one --recursive
+
+      # invalidate cloudfront distribution
+      - name: invalidate
+        run: aws cloudfront create-invalidation --distribution-id E2CCQI91M1HV67 --paths "/*"
