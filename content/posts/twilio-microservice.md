@@ -14,4 +14,6 @@ In this project, I use Twilio for sending text messages, combined with AWS Lambd
 2. **API Gateway Configuration**: I created a POST method API with a custom domain name and mapped it to my Lambda function.
 3. **Route53 Configuration**: I updated an A record on Route53 with my API Gateway's ARN to handle the domain and API mapping seamlessly.
 
+Check out my complete guide on [GitHub](https://github.com/nhatvo1502/twilio-microservice)
+
 By the end of this tutorial, you’ll have a robust and scalable SMS notification service that can be easily integrated into any application. Let’s get started!
