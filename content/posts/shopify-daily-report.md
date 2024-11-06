@@ -1,6 +1,6 @@
 ---
 title: 'Shopify Daily Report'
-date: 2024-11-04T14:45:48-08:00
+date: 2024-11-04T14:45:48-07:00
 draft: false
 ---
 
