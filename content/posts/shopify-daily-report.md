@@ -26,6 +26,6 @@ I'm sure there are more sophisticated solutions out there and this is my humble 
 4. Data Validation and Transformation: Incorporate processes for data validation and transformation before loading data into DynamoDB to improve overall data quality.
 5. Enhance Power BI Dashboards: Add more interactive elements and deeper analytics in Power BI to provide valuable insights for decision-making.
 
-Check out this project on my [GitHub](https://github.com/nhatvo1502/twilio-microservice).
+Check out this project on my [GitHub](https://github.com/nhatvo1502/shopify-api-report).
 
 Thank you for visiting!
