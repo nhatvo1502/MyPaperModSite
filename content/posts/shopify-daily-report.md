@@ -1,7 +1,7 @@
 ---
 title: 'Shopify Daily Report'
 date: 2024-11-04T14:45:48-08:00
-draft: true
+draft: false
 ---
 
 ![image](/images/shopify-api-daily-report/cover.png)
