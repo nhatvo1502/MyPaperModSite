@@ -5,13 +5,12 @@ draft: false
 ---
 
 ![image](/images/shopify-api-daily-report/cover.png)
-Hey there! Welcome to my tech blog. I’m excited to share a little project: automating Shopify orders data into a database warehouse and setting up the connection for analysis.
+Hey there! Welcome to my tech blog. I’m excited to share a little project: automating Shopify orders data into a database warehouse and setting up the connection for analysis. I wanted a simple way to fetch data and get real-time insights without all the manual effort. So, I set up AWS Event Scheduler to trigger data retrieval, used AWS Lambda for serverless processing, and chose DynamoDB for storage. To connect DynamoDB to Microsoft Power BI, I used CDATA Universal Software to create an ODBC driver.
 
 I'm sure there are more sophisticated solutions out there and this is my humble approach, but I hope you find this useful! Let’s turn Shopify orders into awesome business insights together!
 ![image](/images/shopify-api-daily-report/bi4.png)
 
 ### Setup
-I wanted a simple way to fetch data and get real-time insights without all the manual effort. So, I set up AWS Event Scheduler to trigger data retrieval, used AWS Lambda for serverless processing, and chose DynamoDB for storage. To connect DynamoDB to Microsoft Power BI, I used CDATA Universal Software to create an ODBC driver.
 
 1. AWS Lambda: I created a Lambda function to fetch data from Shopify and store it in DynamoDB.
 2. AWS Event Scheduler: I use Event Scheduler to trigger the Lambda function daily.
