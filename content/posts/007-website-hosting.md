@@ -1,33 +1,32 @@
 ---
 title: 'How I host my website on AWS using Domain from Godaddy.com'
 date: 2024-01-29T11:13:33-08:00
-draft: true
+draft: false
 author: Nhat Vo
 ---
 
 # Intro
-My goal is to host a website that is secure, cheap and can be browsed from both subdomain (with www.) and root domain (without wwww.). I bought my first domain name from GoDaddy and I choose AWS for hosting.
+Hey there! When I decided to launch my website, I wanted a reliable and scalable solution. After buying my domain from GoDaddy, I turned to Amazon Web Services (AWS) for hosting. It’s been an exciting journey figuring out the best setup.
+
+I use Amazon S3 to store my website files, Route 53 for domain name system (DNS) management, and CloudFront to deliver content quickly and securely. It wasn’t all smooth sailing, but the flexibility and power of AWS made it worth it. Join me as I share the highs and lows of getting my site online using GoDaddy and AWS services!
 
 ![image](/images/007/Drawing8.png)
 
 # Step 1: Purchase my first domain
+Initially, I planned to buy my domain directly from AWS, but Route 53 doesn’t support the .one top-level domain. So, I ended up purchasing it from GoDaddy instead. This choice means I need to update the Nameserver (NS) records in the GoDaddy console—an extra step compared to buying directly from AWS, where this would be unnecessary.
 
-At first, I planned to buy my first domain from AWS but they don't support *.one* so I bought from GoDaddy instead. I will need to update its Nameservers records (NS) in GoDaddy console as an extra step compares to buying directly from AWS registra which I don't have to.
+If you're curious about which top-level domains AWS supports, you can check out the full list here[https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/registrar-tld-list.html].
 
-At first, I tried to purchase from AWS but Route53 doesn't support *.one*. Here is a list of all top-level domains that AWS support. 
->https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/registrar-tld-list.html
-
-Having a domain on GoDaddy and hosting on AWS meaning I have to update their Nameservers.
+Having a domain on GoDaddy and hosting on AWS means I have to manage the Nameservers accordingly.
 
 # Step 2: Route53 NameServers
 
-First, I will to create a Route53 Hosted Zone. By default, AWS will provide four NameServers with a NS Record. Then, I can use these NameServers to update on GoDaddy Domain.
+First, I need to create a Route 53 Hosted Zone. AWS will provide four NameServers (NS) by default. I’ll use these to update the NS records on my GoDaddy domain.
 
-## Route53 new Hosted Zone
-=======
-When we first buy a domain from GoDaddy, by default, GoDaddy will provides 2 default NS records that point to GoDaddy server. Since I'm going to use AWS Route53, I will modify my domain NS.
+## Creating a New Hosted Zone in Route 53
+When you buy a domain from GoDaddy, it comes with two default NS records pointing to GoDaddy servers. Since I will need to configure CloudFront in the end, I will have Godaddy gives up DNS administration to AWS Route 53.
 
-## First, I need to generate new AWS NameServers from Route53
+### Steps to Generate New AWS NameServers from Route 53:
 1. Sign in to **AWS Management Console** and navigate to Route53.
 2. On the left panel, select **Hosted zones**.
 3. Choose **Create hosted zone**.
@@ -35,25 +34,26 @@ When we first buy a domain from GoDaddy, by default, GoDaddy will provides 2 def
 5. Under **Type**, I left it unchanged as **Public hosted zone**.
 6. Under **Tags**, choose **Add tag**, with **Key** is **"Website"** and **Value** is **"www.nvo.one"*** to keep track of my resources later on.
 7. Choose **Create Hosted Zone**
-8. Route53 will automatically create a new set of NS with 4 records, I left this tab open and will come back to copy these value for the next step.
+8. Route 53 will automatically generate a new set of NS records (four in total). Keep this tab open, as you'll need these values for the next step.
 
 ## Update GoDaddy Domain's NS
-=======
-## Then, use the AWS's NS and put them in my domain's NS
-1. Sign in to Godaddy.com console
+Next, I need to update my GoDaddy domain’s NS records to use the AWS NameServers.
+
+### Steps to Update GoDaddy Domain's NS Records:
+1. Sign in to `Godaddy.com` console
 2. Choose the "Nine dots" next to my Profile to expand the nav menu.
-3. Choose **Domains**
-4. Highlight my domain name, choose the "3 dots" to expand the settings bar and choose **Edit DNS**
-5. Under my domain **Domain Settings* menu bar, choose **Nameservers**
-6. Choose **Change Nameservers**
-7. Godaddy asks for my confirmation by replacing the Nameservers record, it will remove Godaddy NS, choose **Yes**
-8. I go back to my AWS Route53 from the previous tab to copy each NS Records and paste in GoDaddy console. By default,GoDaddy only provide 2 NS records. I increase these number of records to 4 to match with what AWS Route53 provides.
+3. Choose `Domains`
+4. Highlight my domain name, choose the "3 dots" to expand the settings bar and choose `Edit DNS`
+5. Under my domain `Domain Settings` menu bar, choose `Nameservers`
+6. Choose `Change Nameservers`
+7. Confirm the change by choosing `Yes` to replace the GoDaddy NS records.
+8. Go back to your AWS Route 53 tab to copy each NS record and paste them into the GoDaddy console. By default, GoDaddy provides only two NS records, so you’ll need to add two more to match the four provided by AWS Route 53.
 
 # Step 3: Request a SSL certificate
 
-My website will requires a public certificate in order for Amazon CloudFront distributions to configure CloudFront to require viewers use HTTPS so that connections are encrypted when CoudFront communicate with viewers.
+My website requires a public certificate so Amazon CloudFront can enforce HTTPS, ensuring all connections between CloudFront and viewers are encrypted.
 
-CloudFront can only use certificate created in US East (N. Virginia) Region. If I create a SSL Certification in any region which is not US East, my CloudFront distribution won't be able to adopt the SSL certifications. Here is how I create my free - AWS provided SSL Certification
+However, CloudFront can only use certificates created in the US East (N. Virginia) region. If an SSL certificate is created in any other region, CloudFront won't be able to use it. Here’s how I create my free AWS-provided SSL certificate:
 
 1. Sign in to **AWS Management Console** and navigate to **ACM**
 2. On the left panel, select **Request certificate**
@@ -67,7 +67,7 @@ CloudFront can only use certificate created in US East (N. Virginia) Region. If 
 10. It took less than 30' to verify my domain, and the status will change to **Issued** when it's ready to be used.
 
 # Step 4: Create and Set Up S3 bucket
-I will need 2 buckets: one is for my subdomain www.nvo.one which will contains my static webside, and another one for my root nvo.one which will point to my subdomain bucket.
+I will need 2 buckets: one is for my subdomain **www.nvo.one** which will contains my static webside, and another one for my root **nvo.one** which will point to my subdomain bucket.
 
 ## Create and Set Up my sub-domain bucket
 I need to create a bucket to store my static website content
@@ -100,7 +100,10 @@ I need to create a bucket to store my static website content
 
 ## Create and Set Up your root domain
 
-The purpose of this bucket is to allow users to be able to browse to my website without typing *www.*, I need to create another bucket to response to this request and redirect the users to my S3 bucket where the content is at.
+
+Sure, here’s a rephrased version of that section:
+
+To enable users to access my website without typing *www.*, I need to create an additional S3 bucket. This bucket will handle requests and redirect users to my main S3 bucket where the website content is hosted.
 
 1. Create bucket
 2. Name it **nvo.one** (without ***www.***)

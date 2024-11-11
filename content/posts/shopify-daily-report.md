@@ -1,7 +1,7 @@
 ---
 title: 'Fetching Shopify API using AWS Lambda and DynamoDB'
 date: 2024-11-04T14:45:48-08:00
-draft: true
+draft: false
 ---
 
 ![image](/images/shopify-api-daily-report/cover.png)
