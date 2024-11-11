@@ -5,12 +5,12 @@ draft: true
 ---
 
 ![image](/images/shopify-api-daily-report/cover.png)
-Hey there! Welcome to my tech blog. I’m excited to share a little project: automating Shopify orders data into a database warehouse and setting up the connection for analysis.
+Hey there! Welcome to my tech blog. I’m excited to share a little project: automating Shopify orders data into a database warehouse and setting up the connection for analysis. I wanted a simple way to fetch data and get real-time insights without all the manual effort. So, I set up AWS Event Scheduler to trigger data retrieval, used AWS Lambda for serverless processing, and chose DynamoDB for storage. To connect DynamoDB to Microsoft Power BI, I used CDATA Universal Software to create an ODBC driver.
 
 I'm sure there are more sophisticated solutions out there and this is my humble approach, but I hope you find this useful! Let’s turn Shopify orders into awesome business insights together!
+![image](/images/shopify-api-daily-report/bi4.png)
 
 ### Setup
-I wanted a simple way to fetch data and get real-time insights without all the manual effort. So, I set up AWS Event Scheduler to trigger data retrieval, used AWS Lambda for serverless processing, and chose DynamoDB for storage. To connect DynamoDB to Microsoft Power BI, I used CDATA Universal Software to create an ODBC driver.
 
 1. AWS Lambda: I created a Lambda function to fetch data from Shopify and store it in DynamoDB.
 2. AWS Event Scheduler: I use Event Scheduler to trigger the Lambda function daily.
@@ -26,6 +26,6 @@ I wanted a simple way to fetch data and get real-time insights without all the m
 4. Data Validation and Transformation: Incorporate processes for data validation and transformation before loading data into DynamoDB to improve overall data quality.
 5. Enhance Power BI Dashboards: Add more interactive elements and deeper analytics in Power BI to provide valuable insights for decision-making.
 
-Check out this project on my [GitHub](https://github.com/nhatvo1502/twilio-microservice).
+Check out this project on my [GitHub](https://github.com/nhatvo1502/shopify-api-report).
 
 Thank you for visiting!

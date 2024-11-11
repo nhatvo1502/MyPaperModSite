@@ -1,7 +1,7 @@
 ---
 title: 'build AWS network infrastructure and deploy resources using Terraform'
 date: 2024-01-16T11:32:20-08:00
-draft: false
+draft: true
 author: Nhat Vo
 categories: 
     - Terraform

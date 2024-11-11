@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>nathaniel</title>
+    <link>http://www.nvo.one/</link>
+    <description>Recent content on nathaniel</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 28 Oct 2024 16:19:06 -0700</lastBuildDate>
+    <atom:link href="http://www.nvo.one/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Send SMS with Twilio using AWS Lambda and API Gateway</title>
+      <link>http://www.nvo.one/posts/twilio-microservice/</link>
+      <pubDate>Mon, 28 Oct 2024 16:19:06 -0700</pubDate>
+      <guid>http://www.nvo.one/posts/twilio-microservice/</guid>
+      <description>Welcome to my tech blog! Today, I’m excited to take you on my cloud journey with a project which I was inspired from real-world challenge: integrating SMS notifications into a software that had numerous restrictions. I needed a solution to notify users whenever the database was updated. Instead of wrestling with the software’s limitations, I decided to create a microservice that could handle SMS notifications independently. This way, the software team can invoke an API to send SMS messages without worrying about the underlying code and integration complexities.</description>
+    </item>
+    <item>
+      <title>How I host my website on AWS using Domain from Godaddy.com</title>
+      <link>http://www.nvo.one/posts/007-website-hosting/</link>
+      <pubDate>Mon, 29 Jan 2024 11:13:33 -0800</pubDate>
+      <guid>http://www.nvo.one/posts/007-website-hosting/</guid>
+      <description>Intro My goal is to host a website that is secure, cheap and can be browsed from both subdomain (with www.) and root domain (without wwww.). I bought my first domain name from GoDaddy and I choose AWS for hosting.&#xA;Step 1: Purchase my first domain At first, I planned to buy my first domain from AWS but they don&amp;rsquo;t support .one so I bought from GoDaddy instead. I will need to update its Nameservers records (NS) in GoDaddy console as an extra step compares to buying directly from AWS registra which I don&amp;rsquo;t have to.</description>
+    </item>
+    <item>
+      <title>build AWS network infrastructure and deploy resources using Terraform</title>
+      <link>http://www.nvo.one/posts/004-automate-iac/</link>
+      <pubDate>Tue, 16 Jan 2024 11:32:20 -0800</pubDate>
+      <guid>http://www.nvo.one/posts/004-automate-iac/</guid>
+      <description>1. Source Code https://github.com/nhatvo1502/Automate-IaC/tree/main 2. What the code does 2.1. create-resource.yml configure aws credential verify aws credential verify aws s3 permission create s3 bucket for terraform backend copy file from GH to runner verify terraform file terraform init -&amp;gt; apply 2.2 destroy-resource.yml configure aws credential copy file from GH to runner verify terraform file terraform init -&amp;gt; destroy empty s3 backend bucket delete-bucket 2.3 main.tf configure s3 as backend create an s3 bucket create a keypair using a public key from GitHub Secret AMI lookup create VPC create a subnet create a network interface create EC2 instance 3.</description>
+    </item>
+    <item>
+      <title>get aws credential report using github action</title>
+      <link>http://www.nvo.one/posts/002-aws-credential-report/</link>
+      <pubDate>Mon, 15 Jan 2024 10:10:29 -0800</pubDate>
+      <guid>http://www.nvo.one/posts/002-aws-credential-report/</guid>
+      <description>I. Introduction This project is inspired by one of my dear friend. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It&amp;rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.&#xA;II. Our Game-plan We will leverage Github Action to execute a set of commands to generate AWS Credential Report, download it, decode, pipe the content into csv file and finally copy to a existing S3 bucket.</description>
+    </item>
+    <item>
+      <title>About Me</title>
+      <link>http://www.nvo.one/posts/about-me/</link>
+      <pubDate>Mon, 08 Jan 2024 16:40:52 -0800</pubDate>
+      <guid>http://www.nvo.one/posts/about-me/</guid>
+      <description>&amp;ldquo;Humility is not thinking less of yourself, it&amp;rsquo;s thinking of yourself less.&amp;rdquo;&#xA;Rick Warren </description>
+    </item>
+    <item>
+      <title>Search</title>
+      <link>http://www.nvo.one/posts/search/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://www.nvo.one/posts/search/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>
