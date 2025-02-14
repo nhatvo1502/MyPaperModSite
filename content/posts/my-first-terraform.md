@@ -19,9 +19,9 @@ The idea is to use Infrastructure as Code (IaC) to quickly spin up a simple yet 
 - I launched a `t3.micro` Linux instance in both the **Public Subnet** and **Private Subnet**.  
 - First, I SSH into the **Public Instance** using its public IP address.
 ![image](/images/my-first-terraform/sshpublic.png)
-- Then, I SSH into the **Private Instance** using its private IP address.
+- Then, I recreated my private key and stored it on the Public Instance, before SSH into the **Private Instance** using its private IP address.
 ![image](/images/my-first-terraform/sshprivate.png)
-- From Private Instance, I couldn't ping google.com nor able to *yum update* it. The first thing I check was my Route Tables and voila, looks like I got to associate my Private RT with Private subnet, therefore AWS has to created a default RT and associated it with the Private Subnet which is not what we want because our instance cannot reach NAT Gateway therefore no connection.
+- From Private Instance, I couldn't ping google.com nor able to `yum update it`. The first thing I check was my Route Tables and voila, looks like I forgot to associate my Private RT with Private subnet, therefore AWS has to created a default RT and associated it with the Private Subnet which is not what we want because our instance cannot reach NAT Gateway therefore no connection.
 ![image](/images/my-first-terraform/routetablemessup.png)
 - I went back to my main.tf and added this block...
 ```
@@ -36,7 +36,7 @@ resource "aws_route_table_association" "private" {
 terraform plan
 terraform apply --auto-approve
 ```
-...make sure Private Route Table is in placed...
+...make sure Private Route Table is in placed, as you can see, the Private Subnet is now properly...
 ![image](/images/my-first-terraform/routetablecorrected.png)
 ... I can ping and update Private Instance as the traffic has succesfully flows through the Private Route Table and reach NAT Gateway!
 ![image](/images/my-first-terraform/testconnection1.png)
