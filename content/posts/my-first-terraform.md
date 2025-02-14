@@ -12,11 +12,33 @@ The idea is to use Infrastructure as Code (IaC) to quickly spin up a simple yet 
 - **A Private Subnet** (`10.0.2.0/24`) that’s a little more closed off—this one doesn’t have direct internet access.  
 - **A NAT Gateway** placed in the public subnet, with an Elastic IP. This allows instances in the private subnet to reach the internet for things like updates, but without exposing them to the outside world. We handle all this securely with a Private Route Table.
 
-## What I Tested:
+## Testing:
 - I launched a `t3.micro` Linux instance in both the **Public Subnet** and **Private Subnet**.  
-- First, I SSH into the **Public Instance** using its public IP address.  
-- Then, I SSH into the **Private Instance** using its private IP address.  
-- To make sure everything worked as expected, I tried a `yum update` and also pinged `google.com` from the private instance to test the internet connection.
+- First, I SSH into the **Public Instance** using its public IP address.
+![image](/images/my-first-terraform/sshpublic.drawio.png)
+- Then, I SSH into the **Private Instance** using its private IP address.
+![image](/images/my-first-terraform/sshprivate.drawio.png)
+- From Private Instance, I couldn't ping google.com nor able to *yum update* it. The first thing I check is my Route Tables and voila, looks like I got to associate my Private RT with Private subnet, therefore AWS has to created a default RT
+![image](/images/my-first-terraform/routetablemessup.drawio.png)
+- I went back to my main.tf and added this block...
+```
+# Associate Private Route Table with Private Subnet
+resource "aws_route_table_association" "private" {
+	subnet_id = aws_subnet.terraform_private_subnet_1.id
+	route_table_id = aws_route_table.terraform_rt_private_1.id
+}
+```
+...rerun terraform...
+```
+terraform plan
+terraform apply --auto-approve
+```
+...make sure Private Route Table is in placed...
+![image](/images/my-first-terraform/routetablecorrected.drawio.png)
+...and voila, I can ping and update Private Instance as the traffic has succesfully flows through the Private Route Table and reach NAT Gateway
+![image](/images/my-first-terraform/testconnection1.drawio.png)
+![image](/images/my-first-terraform/testconnection2.drawio.png)
+
 
 ## Key Pairs and Security Notes:
 - To keep things simple, I generated a **public/private key pair** on my local computer using PowerShell:  
