@@ -4,6 +4,8 @@ date: 2025-02-13T17:04:35-08:00
 draft: false
 ---
 ![image](/images/my-first-terraform/my-first-terraform.drawio.png)
+
+Check out my project on [GitHub](https://github.com/nhatvo1502/my-first-terraform)
 ## The Goal:
 The idea is to use Infrastructure as Code (IaC) to quickly spin up a simple yet secure virtual network on AWS. Terraform CLI is my tool of choice for managing it all, so I can automate the setup and ensure everything stays organized and reproducible.
 
