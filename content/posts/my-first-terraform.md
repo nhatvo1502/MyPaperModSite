@@ -3,6 +3,7 @@ title: 'My First Terraform'
 date: 2025-02-13T17:04:35-08:00
 draft: false
 ---
+![image](/images/my-first-terraform/my-first-terraform.drawio.png)
 ## The Goal:
 The idea is to use Infrastructure as Code (IaC) to quickly spin up a simple yet secure virtual network on AWS. Terraform CLI is my tool of choice for managing it all, so I can automate the setup and ensure everything stays organized and reproducible.
 
@@ -15,11 +16,11 @@ The idea is to use Infrastructure as Code (IaC) to quickly spin up a simple yet 
 ## Testing:
 - I launched a `t3.micro` Linux instance in both the **Public Subnet** and **Private Subnet**.  
 - First, I SSH into the **Public Instance** using its public IP address.
-![image](/images/my-first-terraform/sshpublic.drawio.png)
+![image](/images/my-first-terraform/sshpublic.png)
 - Then, I SSH into the **Private Instance** using its private IP address.
-![image](/images/my-first-terraform/sshprivate.drawio.png)
-- From Private Instance, I couldn't ping google.com nor able to *yum update* it. The first thing I check is my Route Tables and voila, looks like I got to associate my Private RT with Private subnet, therefore AWS has to created a default RT
-![image](/images/my-first-terraform/routetablemessup.drawio.png)
+![image](/images/my-first-terraform/sshprivate.png)
+- From Private Instance, I couldn't ping google.com nor able to *yum update* it. The first thing I check was my Route Tables and voila, looks like I got to associate my Private RT with Private subnet, therefore AWS has to created a default RT and associated it with the Private Subnet which is not what we want because our instance cannot reach NAT Gateway therefore no connection.
+![image](/images/my-first-terraform/routetablemessup.png)
 - I went back to my main.tf and added this block...
 ```
 # Associate Private Route Table with Private Subnet
@@ -34,10 +35,10 @@ terraform plan
 terraform apply --auto-approve
 ```
 ...make sure Private Route Table is in placed...
-![image](/images/my-first-terraform/routetablecorrected.drawio.png)
-...and voila, I can ping and update Private Instance as the traffic has succesfully flows through the Private Route Table and reach NAT Gateway
-![image](/images/my-first-terraform/testconnection1.drawio.png)
-![image](/images/my-first-terraform/testconnection2.drawio.png)
+![image](/images/my-first-terraform/routetablecorrected.png)
+... I can ping and update Private Instance as the traffic has succesfully flows through the Private Route Table and reach NAT Gateway!
+![image](/images/my-first-terraform/testconnection1.png)
+![image](/images/my-first-terraform/testconnection2.png)
 
 
 ## Key Pairs and Security Notes:
