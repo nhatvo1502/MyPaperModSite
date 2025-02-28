@@ -14,6 +14,9 @@ taxonomies:
   tag: tags
 
 params:
+  assets:
+    customCSS:
+      - css/theme-vars.css
   languages:
     us:
       languageCode: en-US
