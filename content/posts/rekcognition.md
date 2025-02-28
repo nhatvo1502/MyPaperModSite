@@ -167,3 +167,4 @@ I have only scratched the surface of AWS Rekognition's use cases. This small app
 *Klayer https://github.com/keithrozario/Klayers* \
 *Rekognition Python https://docs.aws.amazon.com/rekognition/latest/customlabels-dg/ex-lambda.html*
 
+Check out this project on my [GitHub](https://github.com/nhatvo1502/aws-rekognition-image-processing).
