@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><style>
+    .disqus-reactions {
+        display: none !important;
+    }
+</style>
+</head>
+
+<body class="list dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://www.nvo.one/" accesskey="h" title="nathaniel (Alt + H)">nathaniel</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://www.nvo.one/posts/about-me" title="about me">
+                    <span>about me</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://www.nvo.one/posts" title="posts">
+                    <span class="active">posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://www.nvo.one/categories" title="categories">
+                    <span>categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://www.nvo.one/posts/search" title="search">
+                    <span>search</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><div class="breadcrumbs"><a href="http://www.nvo.one/">Home</a></div>
+  <h1>
+    Posts
+  </h1>
+</header>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Rekognition
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Intro: Recently, I explored a simple yet powerful way to achieve image processing using AWS Lambda and AWS Rekognition. With Machine Learning on the rise, I think it would be a cool project for me to get my hands on this topic. In this post, I’ll walk through a scalable and cost-effective approach: using AWS Lambda to process images stored in an S3 bucket, analyze their content with Rekognition to identify objects, faces, or text, and then store the extracted metadata in another S3 bucket for further use....</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-02-27 13:35:59 -0800 PST'>February 27, 2025</span>&nbsp;·&nbsp;4 min&nbsp;·&nbsp;Nhat Vo</footer>
+  <a class="entry-link" aria-label="post link to Rekognition" href="http://www.nvo.one/posts/rekcognition/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">My First Terraform
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Check out my project on GitHub
+The Goal: The idea is to use Infrastructure as Code (IaC) to quickly spin up a simple yet secure virtual network on AWS. Terraform CLI is my tool of choice for managing it all, so I can automate the setup and ensure everything stays organized and reproducible.
+What’s Inside the Infrastructure: A VPC in the us-west-1 region with a CIDR block of 10.0.0.0/16—this is the foundation of the network....</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-02-13 17:04:35 -0800 PST'>February 13, 2025</span>&nbsp;·&nbsp;3 min</footer>
+  <a class="entry-link" aria-label="post link to My First Terraform" href="http://www.nvo.one/posts/my-first-terraform/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Fetching Shopify API using AWS Lambda and DynamoDB
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Hey there! Welcome to my tech blog. I’m excited to share a little project: automating Shopify orders data into a database warehouse and setting up the connection for analysis. I wanted a simple way to fetch data and get real-time insights without all the manual effort. So, I set up AWS Event Scheduler to trigger data retrieval, used AWS Lambda for serverless processing, and chose DynamoDB for storage. To connect DynamoDB to Microsoft Power BI, I used CDATA Universal Software to create an ODBC driver....</p>
+  </div>
+  <footer class="entry-footer"><span title='2024-11-04 14:45:48 -0800 PST'>November 4, 2024</span>&nbsp;·&nbsp;2 min</footer>
+  <a class="entry-link" aria-label="post link to Fetching Shopify API using AWS Lambda and DynamoDB" href="http://www.nvo.one/posts/shopify-daily-report/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Send SMS with Twilio using AWS Lambda and API Gateway
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Welcome to my tech blog! Today, I’m excited to take you on my cloud journey with a project which I was inspired from real-world challenge: integrating SMS notifications into a software that had numerous restrictions. I needed a solution to notify users whenever the database was updated. Instead of wrestling with the software’s limitations, I decided to create a microservice that could handle SMS notifications independently. This way, the software team can invoke an API to send SMS messages without worrying about the underlying code and integration complexities....</p>
+  </div>
+  <footer class="entry-footer"><span title='2024-10-28 16:19:06 -0700 PDT'>October 28, 2024</span>&nbsp;·&nbsp;2 min</footer>
+  <a class="entry-link" aria-label="post link to Send SMS with Twilio using AWS Lambda and API Gateway" href="http://www.nvo.one/posts/twilio-microservice/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">About Me
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>“Humility is not thinking less of yourself, it’s thinking of yourself less.”
+Rick Warren </p>
+  </div>
+  <footer class="entry-footer"><span title='2024-01-08 16:40:52 -0800 PST'>January 8, 2024</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;Nhat Vo</footer>
+  <a class="entry-link" aria-label="post link to About Me" href="http://www.nvo.one/posts/about-me/"></a>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2025 <a href="http://www.nvo.one/">nathaniel</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

@@ -3,39 +3,27 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://www.nvo.one/</loc>
-    <lastmod>2024-10-28T16:19:06-07:00</lastmod>
+    <lastmod>2025-02-27T13:35:59-08:00</lastmod>
   </url><url>
     <loc>http://www.nvo.one/posts/</loc>
-    <lastmod>2024-10-28T16:19:06-07:00</lastmod>
+    <lastmod>2025-02-27T13:35:59-08:00</lastmod>
+  </url><url>
+    <loc>http://www.nvo.one/posts/rekcognition/</loc>
+    <lastmod>2025-02-27T13:35:59-08:00</lastmod>
+  </url><url>
+    <loc>http://www.nvo.one/posts/my-first-terraform/</loc>
+    <lastmod>2025-02-13T17:04:35-08:00</lastmod>
+  </url><url>
+    <loc>http://www.nvo.one/posts/shopify-daily-report/</loc>
+    <lastmod>2024-11-04T14:45:48-08:00</lastmod>
   </url><url>
     <loc>http://www.nvo.one/posts/twilio-microservice/</loc>
     <lastmod>2024-10-28T16:19:06-07:00</lastmod>
   </url><url>
-    <loc>http://www.nvo.one/posts/007-website-hosting/</loc>
-    <lastmod>2024-01-29T11:13:33-08:00</lastmod>
-  </url><url>
-    <loc>http://www.nvo.one/categories/aws/</loc>
-    <lastmod>2024-01-16T11:32:20-08:00</lastmod>
-  </url><url>
-    <loc>http://www.nvo.one/posts/004-automate-iac/</loc>
-    <lastmod>2024-01-16T11:32:20-08:00</lastmod>
-  </url><url>
-    <loc>http://www.nvo.one/categories/</loc>
-    <lastmod>2024-01-16T11:32:20-08:00</lastmod>
-  </url><url>
-    <loc>http://www.nvo.one/categories/github-action/</loc>
-    <lastmod>2024-01-16T11:32:20-08:00</lastmod>
-  </url><url>
-    <loc>http://www.nvo.one/categories/terraform/</loc>
-    <lastmod>2024-01-16T11:32:20-08:00</lastmod>
-  </url><url>
-    <loc>http://www.nvo.one/posts/002-aws-credential-report/</loc>
-    <lastmod>2024-01-15T10:10:29-08:00</lastmod>
-  </url><url>
     <loc>http://www.nvo.one/posts/about-me/</loc>
     <lastmod>2024-01-08T16:40:52-08:00</lastmod>
   </url><url>
-    <loc>http://www.nvo.one/posts/search/</loc>
+    <loc>http://www.nvo.one/categories/</loc>
   </url><url>
     <loc>http://www.nvo.one/tags/</loc>
   </url>
