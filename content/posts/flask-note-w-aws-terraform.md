@@ -8,7 +8,7 @@ author: Nhat Vo
 During one of the conversation with a closed friend in Australia, I was inspired by Flask and the idea of using a lightweight webframework to build a web application. Thanks @terryduong for the inspiration and support through out this project.
 
 # Stage 0: Game plan
-The goal is too create a web application that allow user to create login and to take note which will be hosted completely on AWS Cloud. This project has **3 Stages**. 
+The goal is too create a web application that allow my users to create login and take. I will host this app completely on AWS Cloud. This project has **6 Stages**. 
 1. Stage 1: Creating the app
 2. Stage 2: Host locally
 3. Stage 3: Publish the app on AWS using AWS Console
@@ -328,11 +328,14 @@ Everything seems to be working as intented. But deploying this project involves 
 # Stage 4: Automate the deployment using Terraform and Github Action
 
 ## a. CI/CD Pipeline:
-I will streamline my project's deployment and update by leveraging Github Action and Terraform. In order for my Github Action to communicate with my AWS Services, I will need to setup an authentication. I'm familiar with Github Action Environment Secrets but I will learn and use AWS OICD for this project.
-## b. AWS OICD **[4]**:
-Setup AWS Assume Role
-## b. GHAction deploy workflow
-## c. GHAction destroy workflow
+I will streamline my project's deployment and updating by leveraging Github Action and Terraform. In order for my Github Action to communicate with AWS Services, I need to setup an authentication. I had setup AWS Credential using Github Action Environment Secrets before but I will learn and use AWS OICD  for this project.
+## b. AWS OICD:
+I read **[4]** **[5]** to setup AWS OICD role
+
+## c. GHAction deploy workflow
+`terraform\main.tf`
+Clone Repo to the Runner -> Setup OICD -> Create tfstate backend bucket -> Install and Deploy Terraform -> Export Terraform Outputs -> Build and Push Docker Image -> Force ECS Re-deployement
+
 ## d. Modifying docker image
 ## e. GHAction Environment Secrets
 
@@ -351,6 +354,7 @@ Setup AWS Assume Role
 
 **[3]** https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-container-image.html
 
-**[4]** https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
+**[4]** https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html
 
-**[5]** 
+**[5]** https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
+
