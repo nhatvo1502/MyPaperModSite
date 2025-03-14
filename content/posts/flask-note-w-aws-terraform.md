@@ -329,6 +329,7 @@ Everything seems to be working as intented. But deploying this project involves 
 
 ## a. CI/CD Pipeline:
 I will streamline my project's deployment and updating by leveraging Github Action and Terraform. In order for my Github Action to communicate with AWS Services, I need to setup an authentication. I had setup AWS Credential using Github Action Environment Secrets before but I will learn and use AWS OICD  for this project.
+
 ## b. AWS OICD:
 I read **[4]** **[5]** to setup AWS OICD role
 
@@ -336,7 +337,13 @@ I read **[4]** **[5]** to setup AWS OICD role
 `terraform\main.tf`
 Clone Repo to the Runner -> Setup OICD -> Create tfstate backend bucket -> Install and Deploy Terraform -> Export Terraform Outputs -> Build and Push Docker Image -> Force ECS Re-deployement
 
-## d. Modifying docker image
+## d. Passing DB_USERNAME and DB_PASSWORD
+
+
+## d. Passing variables from Terraform Output -> Docker Image
+Since all of the infrastructure instances will be created after the code has been pushed, I used Terraform output to export these values and GitHub Environment variable to capture.
+`__init__.py`
+
 ## e. GHAction Environment Secrets
 
 ## e. Troubleshooting
