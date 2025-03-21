@@ -5,7 +5,11 @@ draft: false
 author: Nhat Vo
 ---
 
+![image](/images/nnote/python-website.drawio.png)
+
 During one of the conversation with a closed friend in Australia, I was inspired by the idea of using a lightweight such as Flask as web framework to build a cloud application. Thanks @terryduong for the inspiration and support for this project.
+
+Check out my project on [GitHub](https://github.com/nhatvo1502/python-website)
 
 # Stage 0: Game plan
  I split this project into **4 Stages**. 
