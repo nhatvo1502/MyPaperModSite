@@ -1,20 +1,19 @@
 ---
 title: "Hosting A Python Flask Note using AWS Services, Terraform, Github Action"
 date: 2025-03-07T07:54:28-08:00
-draft: true
+draft: false
 author: Nhat Vo
 ---
 
-During one of the conversation with a closed friend in Australia, I was inspired by Flask and the idea of using a lightweight webframework to build a web application. Thanks @terryduong for the inspiration and support through out this project.
+During one of the conversation with a closed friend in Australia, I was inspired by the idea of using a lightweight such as Flask as web framework to build a cloud application. Thanks @terryduong for the inspiration and support for this project.
 
 # Stage 0: Game plan
-The goal is too create a web application that allow my users to create login and take. I will host this app completely on AWS Cloud. This project has **6 Stages**. 
+ I split this project into **4 Stages**. 
 1. Stage 1: Creating the app
 2. Stage 2: Host locally
-3. Stage 3: Publish the app on AWS using AWS Console
+3. Stage 3: Hosting on AWS using Console
+4. Stage 4: Hosting on AWS using Terraform
 4. Stage 4: Automate the deployment using Terraform and Github Action
-5. Stage 5: Testing/Debugging
-6. Stage 6: Documentation and blogging
 
 There is a **Reference List** in the end of this page includes all the documents I read to through out this project.
 
@@ -22,28 +21,80 @@ There is a **Reference List** in the end of this page includes all the documents
 
 Thanks to Tech With Tim for this details [tutorial](https://www.youtube.com/watch?v=dam0GPOAvVI&t=407s&ab_channel=TechWithTim)
 
-## a. Python Virtual Environment
+I used **Python Virtual Envinronment** to have all of the dependencies tracked via `requirements.txt` along the way to build docker image later on.
 
-I will need to build a docker image for hosting by the end of Stage 2, I used Python Virtual Envinronment to have all of the dependencies documented along the way.
-
-Create virtual env
 ```bash
-python -m venv .\venv
+python -m venv .\venv 
+./env/scripts/activate 
 ```
-
-Activate virtual env
-```bash
-./env/scripts/activate
-```
-
-I made a few customizations to the app:
-
-## b. Add New Feature
-
-After getting familiar with Python Flask, I challenged myself to add a new function. I feel like **Reset Password** can be really appreciated here.
 
 \
-add this code-block to `auth.py`
+After getting familiar with Python Flask, I challenged myself to add a some flavor of my own into this app. **Reset Password** seesm to be useful here.
+
+\
+First, I added a new button to the nav-bar in `base.html` 
+```html
+<!--website/templates/base.html-->
+<div class="collapse navbar-collapse" id="navbar">
+  <div class="navbar-nav">
+    {% if user.is_authenticated %}
+    <a class="nav-item nav-link" id="home" href="/">Home</a>
+    <a class="nav-item nav-link" id="resetPassword" href="/reset-password"
+      >Reset Password</a
+    >
+    <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
+    {% else %}
+    <a class="nav-item nav-link" id="login" href="/login">Login</a>
+    <a class="nav-item nav-link" id="signUp" href="/sign-up">Sign Up</a>
+    {% endif %}
+  </div>
+</div>
+```
+\
+Then, I create a new page `reset-password.html`
+```html
+<!--website/templates/reset-password.html-->
+{% extends "base.html" %} {% block title %}Reset Password{% endblock %} {% block
+content %}
+<form method="POST">
+  <h3 align="center">Reset Password</h3>
+  <div class="form-group">
+    <label for="password1">Current Password</label>
+    <input
+      type="password"
+      class="form-control"
+      id="current_password"
+      name="current_password"
+      placeholder="Enter current password"
+    />
+  </div>
+  <div class="form-group">
+    <label for="password2">New Password</label>
+    <input
+      type="password"
+      class="form-control"
+      id="new_password1"
+      name="new_password1"
+      placeholder="Enter new password"
+    />
+  </div>
+  <div class="form-group">
+    <label for="password2">New Password (Confirm)</label>
+    <input
+      type="password"
+      class="form-control"
+      id="new_password2"
+      name="new_password2"
+      placeholder="Re-enter new password"
+    />
+  </div>
+  <br />
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}
+```
+\
+Lastly, I added a new route to `auth.py` that handles the logic
 ```python
 #website/auth.py
 @auth.route('/reset-password', methods=['GET', 'POST'])
@@ -68,30 +119,17 @@ def reset_password():
 				return redirect(url_for('auth.login'))
 	return render_template('reset_password.html', user=current_user)
 ```
-\
-add to nav-bar in `base.html` 
-```html
-<!--website/templates/base.html-->
-<div class="collapse navbar-collapse" id="navbar">
-  <div class="navbar-nav">
-    {% if user.is_authenticated %}
-    <a class="nav-item nav-link" id="home" href="/">Home</a>
-    <a class="nav-item nav-link" id="resetPassword" href="/reset-password"
-      >Reset Password</a
-    >
-    <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
-    {% else %}
-    <a class="nav-item nav-link" id="login" href="/login">Login</a>
-    <a class="nav-item nav-link" id="signUp" href="/sign-up">Sign Up</a>
-    {% endif %}
-  </div>
-</div>
-```
 
 # Stage 2: Hosting Locally
 
-## a. Create MySQL Server:
-Tim used SQLite in his tutorial because it's lightweight and good for small project but it's not supported by AWS. I need a different database engine that is supported by AWS, cost-effective and friendly. For these reason, I choose MySQL **[1]**.
+## 2a. Workflows:
+1. Create DB
+2. Run the app with Python
+3. Integrate *Gunicorn*
+4. Build app as Docker
+
+**MySQL Server**
+SQLite is lightweight and good for small project but AWS doesn't support this engine officially. I chose MySQL because it's cost-effective, user friendly and supported by AWS **[1]**.
 
 Install [MySQL](https://dev.mysql.com/downloads/installer/) and [MySQL Workbench](https://dev.mysql.com/downloads/workbench/)
 
@@ -99,13 +137,17 @@ Install [MySQL](https://dev.mysql.com/downloads/installer/) and [MySQL Workbench
 *Password:* `password` \
 ![image](/images/nnote/mysqlworkbench.png)
 
-## b. Update Connection String and Database Authentication:
-From the virtual environment, install sqlalchemy_utils
+**Update Connection String and Database Authentication**
+To have nnote-app interact with MySQL server, I used `sqlalchemy`
+
+\
+Install `sqlalchemy package`
 ```bash
 pip install sqlalchemy_utils
 ```
-Modify `__init__.py`
 
+\
+Modified `__init__.py`
 ```python
 #website/__init__.py
 from sqlalchemy_utils import database_exists, create_database
@@ -139,19 +181,21 @@ def create_db(url, app):
             print('Created Database!')
 ```
 
-## c. Quick test:
-I ran my project ...
+\
+I will do a quick test to see if my **nnote-app** can interact with the DB
 ```bash
 python .\main.py
 ```
-... and voila, the *nnote* succesfully connect to MySQL Database on local and created 2 tables: `user` and `note` just as how I wanted.
+
+
+... and voila, the **nnote-app** succesfully connect to MySQL Database on local and created 2 tables: `user` and `note` just as how I wanted.
 ![image](/images/nnote/localdb-test1.png)
 
-Now, all we need to to pack all the dependencies into `requirements.txt` and get ready to build a docker image. But before that, we have one issue...
+Now, all we need to to pack all the dependencies into `requirements.txt` and get ready to build a docker image. But before that, I need **Gunicorn**
 
-## d. Gunicorn
+**Gunicorn**
 
-While Flask is great for development, its server is not suitable for concurrent traffics, which we need after moving the project to AWS. I choose Gunicorn **[2]** to handle this issue.
+While Flask is great for development, its server is not suitable for concurrent traffics in production envrinonment. I choose Gunicorn **[2]** to handle Flask's shortcoming.
 
 \
 To install...
@@ -165,10 +209,8 @@ export dependencies...
 pip freeze > requirements.txt
 ```
 
-## e. Install Docker
+**Docker**
 Install [Docker](https://docs.docker.com/desktop/setup/install/windows-install/)
-
-## f. Dockerfile
 
 I create `Dockerfile` under `.\` using `gunicorn` as my WGSI
 ```Dockerfile
@@ -184,23 +226,27 @@ EXPOSE 5000
 
 CMD ["gunicorn", "-b", "0.0.0.0:5000", "website:create_app()"]
 ```
-\
-\
-*build and run docker*
+
+## 2b. Testing:
+build and run docker
 ```bash
-docker build -t flask-app .
-docker run -p 5000:5000 flask-app
+docker build -t nnote-app .
+docker run -p 5000:5000 nnote-app
 ```
 \
 Docker Image is built succesfully, since I exposed `port 5000` from inside the docker container to `port 5000` outside of the container, the correct URL to my nnote-app should be `localhost:5000` or  `http://127.0.0.1:5000`
 ![image](/images/nnote/docker2.png)
 
-Stage 2 is completed, let's get to the most exciting part of this project - **AWS Cloud**.
+**Stage 2 is completed!** I'm excited for the next one -- **AWS Cloud**.
 
-# Stage 3: Hosting on AWS
+# Stage 3: Hosting on AWS using Console
 
-## a. RDS
-1. Navigate to *AWS Console* -> *Amazon RDS* -> Select *Create database*
+## 3a. Workflows:
+What resources that I need on AWS: a MySQL Server, ECR->ECS->Task Definitaion->Service->Task(point back to my container image on ECR)
+
+**Database**
+
+1. Create a **MySQL db** by navigating to *AWS Console* -> *Amazon RDS* -> Select *Create database*
 2. Configure:
 	- Engine options = `MySQL`
 	- Templates = `Free tier`
@@ -208,12 +254,11 @@ Stage 2 is completed, let's get to the most exciting part of this project - **AW
 	- Master password = `password`
 	- Public access = `Yes`
 3. Click *Create database*
-
-Upon the database creation, I grab the endpoint and use MySQL Workbench to connect just to test the connection.
+4. Upon the database creation, I grab the `endpoint` from AWS RDS console and use **MySQL Workbench** test for connection and authentication.
 
 ![image](/images/nnote/aws-rds-1.png)
 
-## b. Update nnote with AWS RDS Connection String and Authentication
+5. Update nnote-app with `endpoint`, `DB_USERNAME="admin"` and `DB_PASSWORD="password"`
 ```python
 #website/__init__.py
 #------------------------------------------------------------------
@@ -233,9 +278,8 @@ def create():
 	app.config['SQLALCHEMY_DATABASE_URI'] = url
 ```
 
-## c. ECR
-To host docker on AWS, I used ECS **[3]***
-1. Navigate to *AWS Console* -> *Amazon Elastic Container Registry* -> *repository* -> *Create depository*
+**ECR**
+1. To create a **Elastic Container Repo** **[3]**, navigate to *AWS Console* -> *Amazon Elastic Container Registry* -> *repository* -> *Create depository*
 2. Configure:
 	- Repository name = `nnote-ecr/app`
 	- Image tag mutability = `Mutable`
@@ -245,14 +289,14 @@ To host docker on AWS, I used ECS **[3]***
 ![image](/images/nnote/ecr-push.png)
 5. I also grabbed the the Repo URI on the way out for later
 
-## d. ECS Cluster
+**ECS Cluster**
 1. Navigate to *AWS Console* -> *Amazon Elastic Container Service* -> *Create cluster*
 2. Configure:
 	- Cluster name = `nnote-us-east-1-cluster`
 	- Infrastructure = `AWS FarGate`
 3. *Create*
 
-## e. ECS Task definition
+**ECS Task definition**
 1. In *AWS Elastic Container Service* Console -> *Task Definition*
 2. Configure - Infrastructure:
 	- Task definition family = `nnote-td`
@@ -264,7 +308,7 @@ To host docker on AWS, I used ECS **[3]***
 	- Essential container = `Yes`
 	- Container port = `80`
 
-## f. ECS Cluster Service
+**ECS Cluster Service**
 1. From *AWS Elastic Container Service* console -> *Cluster* 
 2. Click on our cluster `nnote-us-east-1-cluster` -> under *Services* tab -> *Create*
 3. Configure:
@@ -278,30 +322,32 @@ If everything works as intented, our task will turn 1/1 shortly
 
 ![image](/images/nnote/ecs-service-1-wait.png)
 
-Nothing good come easily. Something wrong with my image that cause my task to exit 
+Nothing good come easily. Something wrong with my image that cause my task to exit. Time for some troubleshootings.
 ![image](/images/nnote/ecs-service-1-error.png)
 ![image](/images/nnote/ecs-service-1-error-1.png)
 
-## g. Troubleshooting
+## 3b. Debug:
 I went back to my local computer to run `docker run` to see if my image is still working properly and receive this error
 ![image](/images/nnote/ecs-service-1-error-2.png)
 
-Error "Access denied for user 'root'@'74.212.237.134' (using password: YES)" which mean my username and password to AWS RDS Database are incorrected. I check the DB credential my `__init__.py` and found my error. I build and succesfully run `docker run` again
+\
+Error `"Access denied for user 'root'@'74.212.237.134' (using password: YES)"` means db authentication isn't configured properly. I quickly check `__init__.py` and found my error. I rebuilt the container and run it locally. The error has gone.
 ![image](/images/nnote/ecs-service-1-error-fixed.png)
 
-I rebuild my docker image and push it to my ECR Repo. AWS ECS Cluster Service won't restart itself automatically, I need to manually redeploy it:
+\
+I push it to my ECR Repo and manually redeploy the Cluster service:
 1. Navigate *AWS Elastic Container Service* console -> Cluster
 2. *nnote-us-east-1-cluster* -> *Services* -> *nnote-service*
-3. Switch to *Tasks* tab -> Under *Update service* drop-down arrow select *Force new deployment*
+3. Switch to *Tasks* tab -> Under *Update service* drop-down arrow > select *Force new deployment*
 
 Finger cross...
 ![image](/images/nnote/ecs-service-2-wait.png)
 
-Voila!
+Voila! The image seems to be interacting with the Database without any issue now.
 ![image](/images/nnote/ecs-service-2-success.png)
 
-## h. Testing
-Let's test if nnote is working!
+## 3c. Testing:
+Let's test if nnote-app, first, we need the *container public IP address*
 1. Amazon *Elastic Container Service* -> *Clusters* -> *nnote-us-east-1-cluster* -> *Services* -> *nnote-service*
 2. Switch to *Tasks* tab -> Select task -> switch to *Networking*
 3. Copy Public Ip address
@@ -310,48 +356,282 @@ Let's test if nnote is working!
 I can access my login screen!
 ![image](/images/nnote/stage2-complete-1.png)
 
+\
 Let's try sign-up...
 ![image](/images/nnote/stage2-complete-1-sign-up.png)
 
+\
 Then add some note...
 ![image](/images/nnote/stage2-complete-1-note.png)
 
-Let's check our `user table` on AWS RDS Database
+\
+Let's check our `nnote_database.user` on AWS RDS Database by navigate to MySQL Workbench > expand `nnote_database` > select `user` > enter this command `SELECT * FROM nnote_database.user`
 ![image](/images/nnote/stage2-complete-1-db-user.png)
 
-How about `note table`?
+\
+How about `nnote_database.note`? `SELECT * FROM nnote_database.note`
 ![image](/images/nnote/stage2-complete-1-db-note.png)
 
-Everything seems to be working as intented. But deploying this project involves a lot of manual work and the authentication between services are not secure. Let's move on the next stage
+Everything seems to be working as intented. But deploying this project involves a lot of manual work and the authentication between services are not secure. Let's streamline the CI/CD and enhance the authentication method at **Stage 4**
 
 
-# Stage 4: Automate the deployment using Terraform and Github Action
+# Stage 4: Hosting on AWS using Terraform
+I automate Stage 3 using Terraform but I still have to build and push docker manually. I add my own VPC in `network.tf`.
+```hcl
+# terraform/network.tf
+resource "aws_vpc" "nnote" {
+  cidr_block           = var.vpc_cidr
+  enable_dns_hostnames = true
 
-## a. CI/CD Pipeline:
-I will streamline my project's deployment and updating by leveraging Github Action and Terraform. In order for my Github Action to communicate with AWS Services, I need to setup an authentication. I had setup AWS Credential using Github Action Environment Secrets before but I will learn and use AWS OICD  for this project.
+  tags = {
+    Name = var.vpc_name
+  }
+}
 
-## b. AWS OICD:
-I read **[4]** **[5]** to setup AWS OICD role
+resource "aws_internet_gateway" "nnote" {
+  vpc_id = aws_vpc.nnote.id
 
-## c. GHAction deploy workflow
-`terraform\main.tf`
-Clone Repo to the Runner -> Setup OICD -> Create tfstate backend bucket -> Install and Deploy Terraform -> Export Terraform Outputs -> Build and Push Docker Image -> Force ECS Re-deployement
+  tags = {
+    Name = "nnote_igw"
+  }
+}
 
-## d. Passing DB_USERNAME and DB_PASSWORD
+resource "aws_subnet" "s1" {
+  vpc_id            = aws_vpc.nnote.id
+  cidr_block        = var.s1_cidr
+  availability_zone = var.s1_az
+
+  tags = {
+    Name = "nnote_vpc_s1"
+  }
+}
+
+resource "aws_subnet" "s2" {
+  vpc_id            = aws_vpc.nnote.id
+  cidr_block        = var.s2_cidr
+  availability_zone = var.s2_az
+
+  tags = {
+    Name = "nnote_vpc_s2"
+  }
+}
+
+resource "aws_route_table" "nnote" {
+  vpc_id = aws_vpc.nnote.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.nnote.id
+  }
+
+  tags = {
+    Name = "nnote_rt"
+  }
+
+  depends_on = [aws_internet_gateway.nnote]
+}
+
+resource "aws_route_table_association" "assoc1" {
+  route_table_id = aws_route_table.nnote.id
+  subnet_id      = aws_subnet.s1.id
+}
+
+resource "aws_route_table_association" "assoc2" {
+  route_table_id = aws_route_table.nnote.id
+  subnet_id      = aws_subnet.s2.id
+}
+```
+
+\
+and update `variables.tf`
+```hcl
+# terraform/variables.tf
+# NETWORK
+variable "vpc_name" {
+  default = "nnote_vpc"
+  type    = string
+}
+
+variable "vpc_cidr" {
+  default = "10.0.0.0/16"
+  type    = string
+}
+
+variable "s1_cidr" {
+  default = "10.0.1.0/24"
+  type    = string
+}
+
+variable "s1_az" {
+  default = "us-east-1a"
+  type    = string
+}
+
+variable "s2_cidr" {
+  default = "10.0.2.0/24"
+  type    = string
+}
+
+variable "s2_az" {
+  default = "us-east-1b"
+  type    = string
+}
+
+variable "vpc_sg_name" {
+  default = "nnote_vpc_sg"
+  type    = string
+}
+```
+
+This stage went smoothly and I didn't encounter any issue which I was happy to cut it short to the **Final Stage**
+
+# Stage 5: Automate deployment using Github Action
+The goal of this stage is to transform my app into a ready-to-deploy application that can be use by anyone
+
+## 5a. Github Actions Workflow:
+1. **Copy repo** to Github Actions Runner
+2. **AWS OICD** to authenticate runner with AWS
+3. **Create S3 bucket** to store Terraform backend tfstate file
+4. **Deploy Terraform**
+5. **Capture Terraform Output**
+6. **Login AWS ECR**
+7. **Build and Push Docker Image** to AWS ECR
+8. **Force ECS Cluster Service's redeployment**
+9. **Roll back if fail()** so that I don't have to clean up AWS Resources if something goes wrong, this is optional and I figure it would make my life so much better for testing
 
 
-## d. Passing variables from Terraform Output -> Docker Image
-Since all of the infrastructure instances will be created after the code has been pushed, I used Terraform output to export these values and GitHub Environment variable to capture.
-`__init__.py`
+**AWS OICD**
 
-## e. GHAction Environment Secrets
+I read **[4]** **[5]** to setup AWS OICD role. It seems very straight forward so I won't document these steps. You will need to configre this from your AWS IAM using your Github token.
 
-## e. Troubleshooting
-## f. Testing
+\
+**Injecting Secrets to Docker Image**
 
-# Stage 5: Testing/Debugging
+I configure `deploy.yml` to pick up `DB_NAME`, `DB_USERNAME`, and `DB_PASSWORD` from the Github Action Secrets. 
 
-# Stage 6: Documentation and bloggin
+To setup **GHA Secrets**
+1. Navigate to your Github repo
+2. Select *Settings*  > *Secrets and variables*
+3. Configure 3 variable with the exact name as below:
+	- `DB_NAME`= *your-db-name* (can be anything, this does not matter)
+	- `DB_USERNAME` = *your-db-username*
+	- `DB_PASSWORD` = *your-db-password*
+
+\
+**Injecting DB_HOST (RDS endpoints) to Docker Image**
+
+Docker Image also needs the endpoints which is resulted from the Terraform's deployment. I output `endpoint` using `output.tf`, capture and exported it into Github Actions Environment.
+```hcl
+# terraform/output.tf
+output "db_endpoint" {
+  value = aws_db_instance.nnotedb.endpoint
+}
+```
+
+I also output `ecr_uri`, `cluster_arn`, `service_name`, and `region` for login ECR, push docker image and reploy cluster service later on.
+```bash
+# .github/workflows/deploy.yml
+- name: Export Terraform output
+        id: tf
+        if: success()
+        run: |
+          echo "TF_EURI=$(terraform output -raw ecr_uri)" >> $GITHUB_ENV
+          echo "TF_CARN=$(terraform output -raw cluster_arn)" >> $GITHUB_ENV
+          echo "TF_SN=$(terraform output -raw service_name)" >> $GITHUB_ENV
+          echo "TF_REGION=$(terraform output -raw region)" >> $GITHUB_ENV
+          HOST=$(echo "$(terraform output -raw db_endpoint)" | cut -d ':' -f1)
+          echo "TF_ENDPOINT=$HOST" >> $GITHUB_ENV
+        working-directory: ./terraform
+```
+
+\
+**Login AWS ECR**
+```yml
+- name: Log in to ECR
+	run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $TF_EURI
+```
+
+**Build and Push Docker**
+Along with **4c** and **4d**, I inject these 4 variables while building the docker image
+```yml
+- name: Build Docker 
+	run: |
+		docker build \
+		--build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
+		--build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+		--build-arg DB_NAME=${{ secrets.DB_NAME }} \
+		--build-arg DB_HOST=${{ env.TF_ENDPOINT }} \
+		-t nnote-app .
+- name: Tag Docker
+	run: docker tag nnote-app:latest $TF_EURI:latest
+
+- name: Push Docker
+	run: docker push $TF_EURI:latest
+```
+
+**Redeploy Cluster Service**
+```yml
+- name: Force Redeployment ECS
+	run: aws ecs update-service --cluster $TF_CARN --service $TF_SN --force-new-deployment --region $TF_REGION
+```
+
+**Roll back if fail()**
+```yml
+- name: Auto clean up if Apply failed
+	if: failure()
+	run: |
+		terraform destroy --auto-approve -var='db_name="a"' -var='db_password="b"' -var='db_username="c"'
+		aws s3 rm s3://nnote-tfstate-031225 --recursive
+		aws s3 rb s3://nnote-tfstate-031225 --force
+	working-directory: ./terraform
+```
+
+## 5b. Debugging:
+I ran into a couple of issues
+
+**Issue 1:** RDS Endpoint from Terraform output contains `:3306`
+Solution: cut the `:3306` from the string
+```yml
+# .github/workflows/deploy.yml
+HOST=$(echo "$(terraform output -raw db_endpoint)" | cut -d ':' -f1)
+echo "TF_ENDPOINT=$HOST" >> $GITHUB_ENV
+```
+
+**Issue 2:** Container cannot authenticate with Database unless I use MySQL Workbench to drop the schemas and redeploy Cluster Service
+Solution: remove `db_name = var.db_name` when create aws_rds_instance
+
+Before...
+```hcl
+resource "aws_db_instance" "nnotedb" {
+  db_name                = var.db_name
+  allocated_storage      = 20
+  engine                 = "mysql"
+  engine_version         = "8.0"
+  instance_class         = var.db_instance_class
+  username               = var.db_username
+  password               = var.db_password
+  vpc_security_group_ids = [aws_security_group.nnote_vpc_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.nnotedb.name
+  skip_final_snapshot    = true
+  publicly_accessible    = true
+}
+```
+
+After...
+```hcl
+resource "aws_db_instance" "nnotedb" {
+  allocated_storage      = 20
+  engine                 = "mysql"
+  engine_version         = "8.0"
+  instance_class         = var.db_instance_class
+  username               = var.db_username
+  password               = var.db_password
+  vpc_security_group_ids = [aws_security_group.nnote_vpc_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.nnotedb.name
+  skip_final_snapshot    = true
+  publicly_accessible    = true
+}
+```
 
 # Reference List:
 
@@ -364,4 +644,3 @@ Since all of the infrastructure instances will be created after the code has bee
 **[4]** https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html
 
 **[5]** https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
-
