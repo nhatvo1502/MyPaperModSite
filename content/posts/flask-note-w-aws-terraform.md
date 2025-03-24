@@ -1,5 +1,5 @@
 ---
-title: "Hosting a Python Flask Note using AWS Services, Terraform, Github Actions"
+title: "Hosting a Python Flask Note Using AWS Services, Terraform, Github Actions"
 date: 2025-03-07T07:54:28-08:00
 draft: false
 author: Nhat Vo
@@ -7,19 +7,19 @@ author: Nhat Vo
 
 ![image](/images/nnote/python-website.drawio.png)
 
-During a conversation with a close friend in Australia, I was inspired by the idea of using a lightweight such as Flask as web framework to build a cloud application. Thanks @terryduong for the inspiration and support for this project.
+During a conversation with a close friend in Australia, I was inspired by the idea of using a lightweight like Flask as web framework to build a cloud application. Thanks @terryduong for the inspiration and support for this project.
 
 Check out my project on [GitHub](https://github.com/nhatvo1502/python-website)
 
 # Stage 0: Game plan
 
-I split this project into **four stages**.
+I split this project into **five stages**.
 
 1. Stage 1: Creating the app
 2. Stage 2: Host locally
 3. Stage 3: Hosting on AWS using Console
 4. Stage 4: Hosting on AWS using Terraform
-5. Stage 4: Automate the deployment using Terraform and Github Actions
+5. Stage 5: Automate the deployment using Terraform and Github Actions
 
 A **Reference List** at the end of this page includes all the documents I consulted throughout this project.
 
@@ -32,6 +32,8 @@ I used a **Python virtual environment** to track all dependencies via `requireme
 ```bash
 python -m venv .\venv
 ./env/scripts/activate
+
+pip freeze > requirements.txt
 ```
 
 \
@@ -59,7 +61,7 @@ First, I added a new button to the nav-bar in `base.html`
 ```
 
 \
-Then, I created a new page `reset-password.html`
+Then, I created a new page, `reset-password.html`
 
 ```html
 <!--website/templates/reset-password.html-->
@@ -104,7 +106,7 @@ content %}
 ```
 
 \
-Finally, I added a new route to `auth.py` to handle the logic
+Finally, I added a new route to `auth.py` to handle the logic.
 
 ```python
 #website/auth.py
