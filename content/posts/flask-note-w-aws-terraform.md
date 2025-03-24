@@ -1,5 +1,5 @@
 ---
-title: "Hosting a Python Flask Note using AWS Services, Terraform, Github Action"
+title: "Hosting a Python Flask Note using AWS Services, Terraform, Github Actions"
 date: 2025-03-07T07:54:28-08:00
 draft: false
 author: Nhat Vo
@@ -12,12 +12,14 @@ During a conversation with a close friend in Australia, I was inspired by the id
 Check out my project on [GitHub](https://github.com/nhatvo1502/python-website)
 
 # Stage 0: Game plan
-I split this project into **four stages**. 
+
+I split this project into **four stages**.
+
 1. Stage 1: Creating the app
 2. Stage 2: Host locally
 3. Stage 3: Hosting on AWS using Console
 4. Stage 4: Hosting on AWS using Terraform
-5. Stage 4: Automate the deployment using Terraform and Github Action
+5. Stage 4: Automate the deployment using Terraform and Github Actions
 
 A **Reference List** at the end of this page includes all the documents I consulted throughout this project.
 
@@ -25,7 +27,7 @@ A **Reference List** at the end of this page includes all the documents I consul
 
 Thanks to Tech With Tim for this details [tutorial](https://www.youtube.com/watch?v=dam0GPOAvVI&t=407s&ab_channel=TechWithTim)
 
-I used **Python Virtual Envinronment** to have all of the dependencies tracked via `requirements.txt` along the way to build Docker image later on.
+I used a **Python virtual environment** to track all dependencies via `requirements.txt`, facilitating the subsequent creation of a Docker image.
 
 ```bash
 python -m venv .\venv
@@ -33,7 +35,7 @@ python -m venv .\venv
 ```
 
 \
-After getting familiar with Python Flask, I challenged myself to add some of my own features to this app.. **Reset Password** seesm to be useful here.
+After becoming familiar with Python Flask, I challenged myself to add some features to this app. A **password reset function** seemed useful.
 
 \
 First, I added a new button to the nav-bar in `base.html`
@@ -57,7 +59,7 @@ First, I added a new button to the nav-bar in `base.html`
 ```
 
 \
-Then, I create a new page `reset-password.html`
+Then, I created a new page `reset-password.html`
 
 ```html
 <!--website/templates/reset-password.html-->
@@ -102,7 +104,7 @@ content %}
 ```
 
 \
-Lastly, I added a new route to `auth.py` that handles the logic
+Finally, I added a new route to `auth.py` to handle the logic
 
 ```python
 #website/auth.py
@@ -515,7 +517,7 @@ variable "vpc_sg_name" {
 
 This stage went smoothly and I didn't encounter any issue which I was happy to cut it short to the **Final Stage**
 
-# Stage 5: Automate deployment using Github Action
+# Stage 5: Automate deployment using Github Actions
 
 The goal of this stage is to transform my app into a ready-to-deploy application that can be use by anyone
 
@@ -538,7 +540,7 @@ I read **[4]** **[5]** to setup AWS OICD role. It seems very straight forward so
 \
 **Injecting Secrets to Docker Image**
 
-I configure `deploy.yml` to pick up `DB_NAME`, `DB_USERNAME`, and `DB_PASSWORD` from the Github Action Secrets.
+I configure `deploy.yml` to pick up `DB_NAME`, `DB_USERNAME`, and `DB_PASSWORD` from the Github Actions Secrets.
 
 To setup **GHA Secrets**
 
