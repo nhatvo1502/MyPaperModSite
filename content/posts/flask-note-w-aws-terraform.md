@@ -4,7 +4,7 @@ date: 2025-03-07T07:54:28-08:00
 draft: false
 author: Nhat Vo
 ---
-
+Deploy infrastructure using Terraform [¹](#ref1), AWS Lambda [²](#ref2), and GitHub Actions [³](#ref3).
 ![image](/images/nnote/python-website.drawio.png)
 
 During a conversation with a close friend in Australia, I was inspired by the idea of using a lightweight framework like Flask to build a cloud application. Thanks @terryduong for the inspiration and support for this project.
@@ -679,14 +679,18 @@ resource "aws_db_instance" "nnotedb" {
 }
 ```
 
-# Reference List:
+## References
+### **[1] MYSQL vs SQLite** {#ref1} 
+[https://www.greengeeks.com/blog/sqlite-vs-mysql/#:~:text=Ultimately%2C%20SQLite%20is%20a%20lightweight,go%2Dto%20for%20RDBMS%20solutions](https://www.greengeeks.com/blog/sqlite-vs-mysql/#:~:text=Ultimately%2C%20SQLite%20is%20a%20lightweight,go%2Dto%20for%20RDBMS%20solutions)
 
-**[1]** https://www.greengeeks.com/blog/sqlite-vs-mysql/#:~:text=Ultimately%2C%20SQLite%20is%20a%20lightweight,go%2Dto%20for%20RDBMS%20solutions.
+### **[2] Gunicorn** {#ref2} 
+[https://flask.palletsprojects.com/en/stable/deploying/gunicorn/](https://flask.palletsprojects.com/en/stable/deploying/gunicorn/)
 
-**[2]** https://flask.palletsprojects.com/en/stable/deploying/gunicorn/
+### **[3] AWS ECS** {#ref2} 
+[https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-container-image.html](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-container-image.html)
 
-**[3]** https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-container-image.html
+### **[4] AWS OICD** {#ref2} 
+[https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html)
 
-**[4]** https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html
-
-**[5]** https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
+### **[5] GitHub Actions and AWS OICD** {#ref2} 
+[https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
