@@ -7,7 +7,7 @@ author: Nhat Vo
 
 ![image](/images/nnote/python-website.drawio.png)
 
-During a conversation with a close friend in Australia, I was inspired by the idea of using a lightweight like Flask as web framework to build a cloud application. Thanks @terryduong for the inspiration and support for this project.
+During a conversation with a close friend in Australia, I was inspired by the idea of using a lightweight framework like Flask to build a cloud application. Thanks @terryduong for the inspiration and support for this project.
 
 Check out my project on [GitHub](https://github.com/nhatvo1502/python-website)
 
