@@ -1,5 +1,5 @@
 ---
-title: "Hosting A Python Flask Note using AWS Services, Terraform, Github Action"
+title: "Hosting a Python Flask Note using AWS Services, Terraform, Github Action"
 date: 2025-03-07T07:54:28-08:00
 draft: false
 author: Nhat Vo
@@ -12,14 +12,14 @@ During one of the conversation with a closed friend in Australia, I was inspired
 Check out my project on [GitHub](https://github.com/nhatvo1502/python-website)
 
 # Stage 0: Game plan
- I split this project into **4 Stages**. 
+I split this project into **four stages**. 
 1. Stage 1: Creating the app
 2. Stage 2: Host locally
 3. Stage 3: Hosting on AWS using Console
 4. Stage 4: Hosting on AWS using Terraform
 4. Stage 4: Automate the deployment using Terraform and Github Action
 
-There is a **Reference List** in the end of this page includes all the documents I read to through out this project.
+A **Reference List** at the end of this page includes all the documents I consulted throughout this project.
 
 # Stage 1: Creating nnote
 
