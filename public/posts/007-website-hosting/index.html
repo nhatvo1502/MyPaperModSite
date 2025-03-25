@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>How I host my website on AWS using Domain from Godaddy.com | nathaniel</title>
+<meta name="keywords" content="">
+<meta name="description" content="Intro Hey there! When I decided to launch my website, I wanted a reliable and scalable solution. After buying my domain from GoDaddy, I turned to Amazon Web Services (AWS) for hosting. It’s been an exciting journey figuring out the best setup.
+I use Amazon S3 to store my website files, Route 53 for domain name system (DNS) management, and CloudFront to deliver content quickly and securely. It wasn’t all smooth sailing, but the flexibility and power of AWS made it worth it.">
+<meta name="author" content="Nhat Vo">
+<link rel="canonical" href="http://localhost:1313/posts/007-website-hosting/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.b609c58d5c11bb90b1a54e04005d74ad1ddf22165eb79f5533967e57df9c3b50.css" integrity="sha256-tgnFjVwRu5CxpU4EAF10rR3fIhZet59VM5Z&#43;V9&#43;cO1A=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/007-website-hosting/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class=" dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="nathaniel (Alt + H)">nathaniel</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/posts/about-me" title="about me">
+                    <span>about me</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/posts" title="posts">
+                    <span>posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories" title="categories">
+                    <span>categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/posts/search" title="search (Alt &#43; /)" accesskey=/>
+                    <span>search</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      How I host my website on AWS using Domain from Godaddy.com
+      <span class="entry-hint" title="Draft">
+        <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
+          <path
+            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+        </svg>
+      </span>
+    </h1>
+    <div class="post-meta"><span title='2024-01-29 11:13:33 -0800 PST'>January 29, 2024</span>&nbsp;·&nbsp;9 min&nbsp;·&nbsp;Nhat Vo
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#intro" aria-label="Intro">Intro</a></li>
+                <li>
+                    <a href="#step-1-purchase-my-first-domain" aria-label="Step 1: Purchase my first domain">Step 1: Purchase my first domain</a></li>
+                <li>
+                    <a href="#step-2-route53-nameservers" aria-label="Step 2: Route53 NameServers">Step 2: Route53 NameServers</a><ul>
+                        
+                <li>
+                    <a href="#creating-a-new-hosted-zone-in-route-53" aria-label="Creating a New Hosted Zone in Route 53">Creating a New Hosted Zone in Route 53</a><ul>
+                        
+                <li>
+                    <a href="#steps-to-generate-new-aws-nameservers-from-route-53" aria-label="Steps to Generate New AWS NameServers from Route 53:">Steps to Generate New AWS NameServers from Route 53:</a></li></ul>
+                </li>
+                <li>
+                    <a href="#update-godaddy-domains-ns" aria-label="Update GoDaddy Domain&rsquo;s NS">Update GoDaddy Domain&rsquo;s NS</a><ul>
+                        
+                <li>
+                    <a href="#steps-to-update-godaddy-domains-ns-records" aria-label="Steps to Update GoDaddy Domain&rsquo;s NS Records:">Steps to Update GoDaddy Domain&rsquo;s NS Records:</a></li></ul>
+                </li></ul>
+                </li>
+                <li>
+                    <a href="#step-3-request-a-ssl-certificate" aria-label="Step 3: Request a SSL certificate">Step 3: Request a SSL certificate</a></li>
+                <li>
+                    <a href="#step-4-create-and-set-up-s3-bucket" aria-label="Step 4: Create and Set Up S3 bucket">Step 4: Create and Set Up S3 bucket</a><ul>
+                        
+                <li>
+                    <a href="#create-and-set-up-my-sub-domain-bucket" aria-label="Create and Set Up my sub-domain bucket">Create and Set Up my sub-domain bucket</a></li>
+                <li>
+                    <a href="#create-and-set-up-your-root-domain" aria-label="Create and Set Up your root domain">Create and Set Up your root domain</a></li></ul>
+                </li>
+                <li>
+                    <a href="#step-5-create-an-amazon-cloudfront-distribution-for-my-subdomain-wwwnvoone" aria-label="Step 5: Create an Amazon CloudFront distribution for my subdomain www.nvo.one">Step 5: Create an Amazon CloudFront distribution for my subdomain www.nvo.one</a><ul>
+                        
+                <li>
+                    <a href="#subdomain-distribution" aria-label="Subdomain distribution">Subdomain distribution</a></li>
+                <li>
+                    <a href="#root-domain-distribution" aria-label="Root domain distribution">Root domain distribution</a></li></ul>
+                </li>
+                <li>
+                    <a href="#step-6-route-dns-traffic-from-my-domain-name-to-my-cloudfront-distributions" aria-label="Step 6: Route DNS traffic from my Domain name to my CloudFront distributions">Step 6: Route DNS traffic from my Domain name to my CloudFront distributions</a><ul>
+                        
+                <li>
+                    <a href="#for-subdomain" aria-label="For subdomain">For subdomain</a></li>
+                <li>
+                    <a href="#for-root" aria-label="For root">For root</a></li></ul>
+                </li>
+                <li>
+                    <a href="#step-7-faq" aria-label="Step 7: FAQ">Step 7: FAQ</a><ul>
+                        
+                <li>
+                    <a href="#invalidation" aria-label="Invalidation">Invalidation</a></li>
+                <li>
+                    <a href="#s3-static-web-hosting-endpoint" aria-label="S3 Static Web Hosting endpoint">S3 Static Web Hosting endpoint</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="intro">Intro<a hidden class="anchor" aria-hidden="true" href="#intro">#</a></h1>
+<p>Hey there! When I decided to launch my website, I wanted a reliable and scalable solution. After buying my domain from GoDaddy, I turned to Amazon Web Services (AWS) for hosting. It’s been an exciting journey figuring out the best setup.</p>
+<p>I use Amazon S3 to store my website files, Route 53 for domain name system (DNS) management, and CloudFront to deliver content quickly and securely. It wasn’t all smooth sailing, but the flexibility and power of AWS made it worth it. Join me as I share the highs and lows of getting my site online using GoDaddy and AWS services!</p>
+<p><img loading="lazy" src="/images/007/Drawing8.png" alt="image"  />
+</p>
+<h1 id="step-1-purchase-my-first-domain">Step 1: Purchase my first domain<a hidden class="anchor" aria-hidden="true" href="#step-1-purchase-my-first-domain">#</a></h1>
+<p>Initially, I planned to buy my domain directly from AWS, but Route 53 doesn’t support the .one top-level domain. So, I ended up purchasing it from GoDaddy instead. This choice means I need to update the Nameserver (NS) records in the GoDaddy console—an extra step compared to buying directly from AWS, where this would be unnecessary.</p>
+<p>If you&rsquo;re curious about which top-level domains AWS supports, you can check out the full list here[https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/registrar-tld-list.html].</p>
+<p>Having a domain on GoDaddy and hosting on AWS means I have to manage the Nameservers accordingly.</p>
+<h1 id="step-2-route53-nameservers">Step 2: Route53 NameServers<a hidden class="anchor" aria-hidden="true" href="#step-2-route53-nameservers">#</a></h1>
+<p>First, I need to create a Route 53 Hosted Zone. AWS will provide four NameServers (NS) by default. I’ll use these to update the NS records on my GoDaddy domain.</p>
+<h2 id="creating-a-new-hosted-zone-in-route-53">Creating a New Hosted Zone in Route 53<a hidden class="anchor" aria-hidden="true" href="#creating-a-new-hosted-zone-in-route-53">#</a></h2>
+<p>When you buy a domain from GoDaddy, it comes with two default NS records pointing to GoDaddy servers. Since I will need to configure CloudFront in the end, I will have Godaddy gives up DNS administration to AWS Route 53.</p>
+<h3 id="steps-to-generate-new-aws-nameservers-from-route-53">Steps to Generate New AWS NameServers from Route 53:<a hidden class="anchor" aria-hidden="true" href="#steps-to-generate-new-aws-nameservers-from-route-53">#</a></h3>
+<ol>
+<li>Sign in to <strong>AWS Management Console</strong> and navigate to Route53.</li>
+<li>On the left panel, select <strong>Hosted zones</strong>.</li>
+<li>Choose <strong>Create hosted zone</strong>.</li>
+<li>Under <strong>Domain name</strong>, I entered nvo.one</li>
+<li>Under <strong>Type</strong>, I left it unchanged as <strong>Public hosted zone</strong>.</li>
+<li>Under <strong>Tags</strong>, choose <strong>Add tag</strong>, with <strong>Key</strong> is <strong>&ldquo;Website&rdquo;</strong> and <strong>Value</strong> is <strong>&ldquo;<a href="https://www.nvo.one">www.nvo.one</a>&rdquo;</strong>* to keep track of my resources later on.</li>
+<li>Choose <strong>Create Hosted Zone</strong></li>
+<li>Route 53 will automatically generate a new set of NS records (four in total). Keep this tab open, as you&rsquo;ll need these values for the next step.</li>
+</ol>
+<h2 id="update-godaddy-domains-ns">Update GoDaddy Domain&rsquo;s NS<a hidden class="anchor" aria-hidden="true" href="#update-godaddy-domains-ns">#</a></h2>
+<p>Next, I need to update my GoDaddy domain’s NS records to use the AWS NameServers.</p>
+<h3 id="steps-to-update-godaddy-domains-ns-records">Steps to Update GoDaddy Domain&rsquo;s NS Records:<a hidden class="anchor" aria-hidden="true" href="#steps-to-update-godaddy-domains-ns-records">#</a></h3>
+<ol>
+<li>Sign in to <code>Godaddy.com</code> console</li>
+<li>Choose the &ldquo;Nine dots&rdquo; next to my Profile to expand the nav menu.</li>
+<li>Choose <code>Domains</code></li>
+<li>Highlight my domain name, choose the &ldquo;3 dots&rdquo; to expand the settings bar and choose <code>Edit DNS</code></li>
+<li>Under my domain <code>Domain Settings</code> menu bar, choose <code>Nameservers</code></li>
+<li>Choose <code>Change Nameservers</code></li>
+<li>Confirm the change by choosing <code>Yes</code> to replace the GoDaddy NS records.</li>
+<li>Go back to your AWS Route 53 tab to copy each NS record and paste them into the GoDaddy console. By default, GoDaddy provides only two NS records, so you’ll need to add two more to match the four provided by AWS Route 53.</li>
+</ol>
+<h1 id="step-3-request-a-ssl-certificate">Step 3: Request a SSL certificate<a hidden class="anchor" aria-hidden="true" href="#step-3-request-a-ssl-certificate">#</a></h1>
+<p>My website requires a public certificate so Amazon CloudFront can enforce HTTPS, ensuring all connections between CloudFront and viewers are encrypted.</p>
+<p>However, CloudFront can only use certificates created in the US East (N. Virginia) region. If an SSL certificate is created in any other region, CloudFront won&rsquo;t be able to use it. Here’s how I create my free AWS-provided SSL certificate:</p>
+<ol>
+<li>Sign in to <strong>AWS Management Console</strong> and navigate to <strong>ACM</strong></li>
+<li>On the left panel, select <strong>Request certificate</strong></li>
+<li>Keep the default selection *<em>Request a public certificate</em>, then choose <strong>Next</strong></li>
+<li>In the <strong>Domain names</strong> section, I entered my domain name <strong>nvo.one</strong></li>
+<li>In the <strong>Validation method</strong>, I choose <strong>DNS validation</strong></li>
+<li>In the <strong>Key algorithm</strong> section, I choose <strong>RSA 2048</strong></li>
+<li>In the Add tags sections, I create a tag name <strong>&ldquo;Website&rdquo;</strong> with value is my website <strong>&ldquo;<a href="https://www.nvo.one">www.nvo.one</a>&rdquo;</strong> to keep track of my resource in AWS</li>
+<li>Choose <strong>Request</strong> to be taken to the <strong>Certificates</strong> page.</li>
+<li>Once the new certificate appears in <strong>Pending</strong> status, choose the certificate ID, and on the certificate details page, choose <strong>Create record in Route53</strong> to add the CNAME records to my domains, I used the same Route53 Hosted Zone above to create records in.</li>
+<li>It took less than 30&rsquo; to verify my domain, and the status will change to <strong>Issued</strong> when it&rsquo;s ready to be used.</li>
+</ol>
+<h1 id="step-4-create-and-set-up-s3-bucket">Step 4: Create and Set Up S3 bucket<a hidden class="anchor" aria-hidden="true" href="#step-4-create-and-set-up-s3-bucket">#</a></h1>
+<p>I will need 2 buckets: one is for my subdomain <strong><a href="https://www.nvo.one">www.nvo.one</a></strong> which will contains my static webside, and another one for my root <strong>nvo.one</strong> which will point to my subdomain bucket.</p>
+<h2 id="create-and-set-up-my-sub-domain-bucket">Create and Set Up my sub-domain bucket<a hidden class="anchor" aria-hidden="true" href="#create-and-set-up-my-sub-domain-bucket">#</a></h2>
+<p>I need to create a bucket to store my static website content</p>
+<ol>
+<li>Sign in to <strong>AWS Management Console</strong> and navigate to <strong>S3</strong></li>
+<li>On the left panel, choose <strong>Buckets</strong></li>
+<li>Choose <strong>Create bucket</strong></li>
+<li>I name it <strong><a href="https://www.nvo.one">www.nvo.one</a></strong></li>
+<li>Under <strong>Block public access (bucket settings)</strong>, untick <strong>Block <em>all</em> public access</strong>, choose <strong>confirm</strong> so that my bucket is accessible by public</li>
+<li>Under <strong>Bucket policy</strong>, choose <strong>Edit</strong>, I copy the policy from AWS, modify my bucket name and save it</li>
+</ol>
+<pre tabindex="0"><code>{
+    &#34;Version&#34;: &#34;2012-10-17&#34;,
+    &#34;Statement&#34;: [
+        {
+            &#34;Sid&#34;: &#34;PublicReadGetObject&#34;,
+            &#34;Effect&#34;: &#34;Allow&#34;,
+            &#34;Principal&#34;: &#34;*&#34;,
+            &#34;Action&#34;: &#34;s3:GetObject&#34;,
+            &#34;Resource&#34;: &#34;arn:aws:s3:::www.nvo.one/*&#34;
+        }
+    ]
+}
+</code></pre><ol start="7">
+<li>Under <strong>Static website hosting</strong>, I choose <strong>Enable</strong></li>
+<li>For <strong>Hosting type</strong>, I choose <strong>Host a static website</strong></li>
+<li>For <strong>Index document</strong>, I entered <strong>&ldquo;index.html&rdquo;</strong></li>
+<li>For <strong>Error document</strong>, I left it blank for now</li>
+<li>Now the bucket is ready to use, I copy my website in</li>
+<li>To test it, choose the bucket, on the nav menu, choose <strong>Properties</strong>, under <strong>Static website hosting</strong>, copy the bucket endpoints and paste it on the browser.</li>
+</ol>
+<h2 id="create-and-set-up-your-root-domain">Create and Set Up your root domain<a hidden class="anchor" aria-hidden="true" href="#create-and-set-up-your-root-domain">#</a></h2>
+<p>Sure, here’s a rephrased version of that section:</p>
+<p>To enable users to access my website without typing <em>www.</em>, I need to create an additional S3 bucket. This bucket will handle requests and redirect users to my main S3 bucket where the website content is hosted.</p>
+<ol>
+<li>Create bucket</li>
+<li>Name it <strong>nvo.one</strong> (without <em><strong>www.</strong></em>)</li>
+<li>Choose Properties</li>
+<li>Under <strong>Static website hosting</strong>, choose <strong>Edit</strong>.</li>
+<li>Choose <strong>Redirect requests fr an object</strong>.</li>
+<li>In the <strong>Host name</strong> box, I entered my subdomain <strong>nvo.one</strong>.</li>
+<li>For <strong>Protocol</strong>, choose <strong>HTTPS</strong>.</li>
+<li>Choose <strong>Save changes</strong></li>
+</ol>
+<h1 id="step-5-create-an-amazon-cloudfront-distribution-for-my-subdomain-wwwnvoone">Step 5: Create an Amazon CloudFront distribution for my subdomain <a href="https://www.nvo.one">www.nvo.one</a><a hidden class="anchor" aria-hidden="true" href="#step-5-create-an-amazon-cloudfront-distribution-for-my-subdomain-wwwnvoone">#</a></h1>
+<p>I will need to also 2 CloudFront distribution: one for subdomain and one for root where they both using my SSL Certification.</p>
+<h2 id="subdomain-distribution">Subdomain distribution<a hidden class="anchor" aria-hidden="true" href="#subdomain-distribution">#</a></h2>
+<ol>
+<li>Sign in to <strong>AWS Management Console</strong> and navigate to CloudFront.</li>
+<li>Choose <strong>Create Distribution</strong>.</li>
+<li>Under <strong>Origin</strong>, for <strong>Origin domain</strong>, I choose my Amazon S3 bucket that I created for my subdomain (ww.nvo.one).\</li>
+<li>For the settings under <strong>Default Cache Behavior Settings</strong>, under <strong>Viewer</strong>, set <strong>Viewer protocol policy</strong> to <strong>Redirect HTTP to HTTPS</strong> and accept the default values for the rest.</li>
+<li>For the fields under Settings, do the following:\</li>
+</ol>
+<ul>
+<li>Choose <strong>Add item</strong> for <strong>Alternate domain (CNAME) - optional</strong> and enter my subdomain name</li>
+<li>For <strong>Custom SSL Certificate</strong>, choose the certificate created above</li>
+<li>For <strong>Default root object</strong> text box, type in <strong>index.html</strong></li>
+<li>I leave everything else default and choose <strong>Create distribution</strong></li>
+</ul>
+<ol start="6">
+<li>Once the distribution created, I monitor the <strong>Status</strong> column, it will takes sometimes to change from <strong>In progress</strong> to <strong>Deployed</strong> where CloudFront will distribute my website to the world. How excited!</li>
+</ol>
+<h2 id="root-domain-distribution">Root domain distribution<a hidden class="anchor" aria-hidden="true" href="#root-domain-distribution">#</a></h2>
+<p>I also want my root domain is distributed CDN to the world to server all the request to my root and of course the response will be redirected from my root bucket.</p>
+<ol>
+<li>Sign in to <strong>AWS Management Console</strong> and navigate to CloudFront</li>
+<li>Choose <strong>Create Distribution</strong>.</li>
+<li>Under <strong>Origin</strong>, for <strong>Origin Domain Name</strong>, I enter my root S3 bucket endpoints.</li>
+<li>For the settings under <strong>Default Cache Behavior Settings</strong>\</li>
+</ol>
+<ul>
+<li>Under <strong>Viewer</strong>, set <strong>Viewer protocol policy</strong> to <strong>Redirect HTTP to HTTPS</strong></li>
+<li>Set <strong>Cache settings</strong> to <strong>CachingDisabled</strong>.</li>
+</ul>
+<ol start="5">
+<li>For the fields under Settings, do the following:\</li>
+</ol>
+<ul>
+<li>Choose <strong>Add item</strong> for <strong>Alternate domain (CNAME) - optional</strong> and enter my subdomain name</li>
+<li>For <strong>Custom SSL Certificate</strong>, choose the certificate created above</li>
+</ul>
+<ol start="6">
+<li>Choose <strong>Create Distribution</strong></li>
+<li>Give it sometimes, the <strong>Status</strong> will change from <strong>In Progress</strong> to <strong>Deployed</strong> that is when the distribution is ready to be used.</li>
+</ol>
+<h1 id="step-6-route-dns-traffic-from-my-domain-name-to-my-cloudfront-distributions">Step 6: Route DNS traffic from my Domain name to my CloudFront distributions<a hidden class="anchor" aria-hidden="true" href="#step-6-route-dns-traffic-from-my-domain-name-to-my-cloudfront-distributions">#</a></h1>
+<p>As of now, I should have <strong>a working domain name that is ready to be accessed by the world</strong> and <strong>2 CloudFront distributions which are ready to distribute my content (nvo.one and <a href="https://www.nvo.one">www.nvo.one</a>)</strong>. Next, I need to create a record for each of the distribution group to Route53 Hosted Zone where my domain name is using the same NS records.</p>
+<h2 id="for-subdomain">For subdomain<a hidden class="anchor" aria-hidden="true" href="#for-subdomain">#</a></h2>
+<ol>
+<li>Sign in to <strong>AWS Management Console</strong> and navigate to Route53</li>
+<li>On the left panel, choose <strong>Hosted zones</strong></li>
+<li>Under Hosted zones, choose my hosted zone <strong>nvo.one</strong></li>
+<li>Choose <strong>Create record</strong>.</li>
+<li>Choose <strong>Switch to wizard</strong>.</li>
+<li>Choose <strong>Simple routing</strong> and choose <strong>Next</strong>.</li>
+<li>In <strong>Record name</strong>, I typed <strong>www</strong> in front of the default value</li>
+<li>In <strong>Record type</strong>, choose <strong>A - Routes traffic to an IPv4 address and some AWS resources</strong></li>
+<li>in <strong>Value/Route traffic to</strong>, choose <strong>Alias to CloudFront distribution</strong>.</li>
+<li>Choose my nvo.one CF distribution.</li>
+<li>For <strong>Evaluate target health</strong>, I choose <strong>No</strong>.</li>
+<li>Choose <strong>Define simple record</strong>.</li>
+</ol>
+<h2 id="for-root">For root<a hidden class="anchor" aria-hidden="true" href="#for-root">#</a></h2>
+<ol>
+<li>Sign in to <strong>AWS Management Console</strong> and navigate to Route53</li>
+<li>On the left panel, choose <strong>Hosted zones</strong></li>
+<li>Under Hosted zones, choose my hosted zone <strong><a href="https://www.nvo.one">www.nvo.one</a></strong></li>
+<li>Choose <strong>Create record</strong>.</li>
+<li>Choose <strong>Switch to wizard</strong>.</li>
+<li>Choose <strong>Simple routing</strong> and choose <strong>Next</strong>.</li>
+<li>In <strong>Record name</strong>, I typed <strong>www</strong> in front of the default value</li>
+<li>In <strong>Record type</strong>, choose <strong>A - Routes traffic to an IPv4 address and some AWS resources</strong></li>
+<li>in <strong>Value/Route traffic to</strong>, choose <strong>Alias to CloudFront distribution</strong>.</li>
+<li>Choose my nvo.one CF distribution.</li>
+<li>For <strong>Evaluate target health</strong>, I choose <strong>No</strong>.</li>
+<li>Choose <strong>Define simple record</strong>.</li>
+</ol>
+<h1 id="step-7-faq">Step 7: FAQ<a hidden class="anchor" aria-hidden="true" href="#step-7-faq">#</a></h1>
+<h2 id="invalidation">Invalidation<a hidden class="anchor" aria-hidden="true" href="#invalidation">#</a></h2>
+<p>There are often a few times after updating my subdomain bucket, my website doesn&rsquo;t really update. Invalidation would help clear out the cache at AWS&rsquo;s edge location and force the edge location to pull from our S3 bucket again. This will guarantee user will see the updates immediately. But it will result a small charge which can accumulate over the time.</p>
+<p>Which will leads to another question that how can I know that my bucket already receive the update and will display it correctly before the edge location TTL runs out and sync up. By using S3 Static Web Hosting endpoint.</p>
+<h2 id="s3-static-web-hosting-endpoint">S3 Static Web Hosting endpoint<a hidden class="anchor" aria-hidden="true" href="#s3-static-web-hosting-endpoint">#</a></h2>
+<p>Once the new update is copied to the S3 bucket, one way that we can see how to website looks like even before it will be pull to the CloudFront Edge&rsquo;s location is to use Statuc Web Hosting endpoint.</p>
+<ol>
+<li>Sign to <strong>AWS Management Console</strong>, navigate to <strong>S3</strong></li>
+<li>Choose to subdomain buckets (<a href="https://www.nvo.one">www.nvo.one</a>)</li>
+<li>Choose <strong>Properties</strong>, scroll to the end</li>
+<li>Copy the <strong>Static Web Hosting endpoints</strong> and paste it into any browser</li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer><div id="disqus_thread"></div>
+<script>
+    
+
+    
+
+    (function() { 
+    var d = document, s = d.createElement('script');
+    s.src = 'https://www-nvo-one.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2025 <a href="http://localhost:1313/">nathaniel</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -2,10 +2,53 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on nathaniel</title>
-    <link>http://www.nvo.one/categories/</link>
+    <link>http://localhost:1313/categories/</link>
     <description>Recent content in Categories on nathaniel</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="http://www.nvo.one/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 16 Jan 2024 11:32:20 -0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AWS</title>
+      <link>http://localhost:1313/categories/aws/</link>
+      <pubDate>Tue, 16 Jan 2024 11:32:20 -0800</pubDate>
+      <guid>http://localhost:1313/categories/aws/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>GitHub Action</title>
+      <link>http://localhost:1313/categories/github-action/</link>
+      <pubDate>Tue, 16 Jan 2024 11:32:20 -0800</pubDate>
+      <guid>http://localhost:1313/categories/github-action/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Terraform</title>
+      <link>http://localhost:1313/categories/terraform/</link>
+      <pubDate>Tue, 16 Jan 2024 11:32:20 -0800</pubDate>
+      <guid>http://localhost:1313/categories/terraform/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Email</title>
+      <link>http://localhost:1313/categories/email/</link>
+      <pubDate>Tue, 16 Jan 2024 09:26:03 -0800</pubDate>
+      <guid>http://localhost:1313/categories/email/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Learn</title>
+      <link>http://localhost:1313/categories/learn/</link>
+      <pubDate>Tue, 16 Jan 2024 09:26:03 -0800</pubDate>
+      <guid>http://localhost:1313/categories/learn/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Malicious</title>
+      <link>http://localhost:1313/categories/malicious/</link>
+      <pubDate>Tue, 16 Jan 2024 09:26:03 -0800</pubDate>
+      <guid>http://localhost:1313/categories/malicious/</guid>
+      <description></description>
+    </item>
   </channel>
 </rss>

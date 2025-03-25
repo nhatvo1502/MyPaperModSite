@@ -2,47 +2,97 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>nathaniel</title>
-    <link>http://www.nvo.one/</link>
+    <link>http://localhost:1313/</link>
     <description>Recent content on nathaniel</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 27 Feb 2025 13:35:59 -0800</lastBuildDate>
-    <atom:link href="http://www.nvo.one/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 07 Mar 2025 07:54:28 -0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hosting a Python Flask Note Using AWS Services, Terraform, Github Actions</title>
+      <link>http://localhost:1313/posts/flask-note-w-aws-terraform/</link>
+      <pubDate>Fri, 07 Mar 2025 07:54:28 -0800</pubDate>
+      <guid>http://localhost:1313/posts/flask-note-w-aws-terraform/</guid>
+      <description>Deploy infrastructure using Terraform ¹, AWS Lambda ², and GitHub Actions ³. During a conversation with a close friend in Australia, I was inspired by the idea of using a lightweight framework like Flask to build a cloud application. Thanks @terryduong for the inspiration and support for this project.
+Check out my project on GitHub
+Stage 0: Game plan I split this project into five stages.
+Stage 1: Creating the app Stage 2: Host locally Stage 3: Hosting on AWS using Console Stage 4: Hosting on AWS using Terraform Stage 5: Automate the deployment using Terraform and Github Actions A Reference List at the end of this page includes all the documents I consulted throughout this project.</description>
+    </item>
     <item>
       <title>Rekognition</title>
-      <link>http://www.nvo.one/posts/rekcognition/</link>
+      <link>http://localhost:1313/posts/rekcognition/</link>
       <pubDate>Thu, 27 Feb 2025 13:35:59 -0800</pubDate>
-      <guid>http://www.nvo.one/posts/rekcognition/</guid>
+      <guid>http://localhost:1313/posts/rekcognition/</guid>
       <description>Intro: Recently, I explored a simple yet powerful way to achieve image processing using AWS Lambda and AWS Rekognition. With Machine Learning on the rise, I think it would be a cool project for me to get my hands on this topic. In this post, I’ll walk through a scalable and cost-effective approach: using AWS Lambda to process images stored in an S3 bucket, analyze their content with Rekognition to identify objects, faces, or text, and then store the extracted metadata in another S3 bucket for further use.</description>
     </item>
     <item>
       <title>My First Terraform</title>
-      <link>http://www.nvo.one/posts/my-first-terraform/</link>
+      <link>http://localhost:1313/posts/my-first-terraform/</link>
       <pubDate>Thu, 13 Feb 2025 17:04:35 -0800</pubDate>
-      <guid>http://www.nvo.one/posts/my-first-terraform/</guid>
+      <guid>http://localhost:1313/posts/my-first-terraform/</guid>
       <description>Check out my project on GitHub
 The Goal: The idea is to use Infrastructure as Code (IaC) to quickly spin up a simple yet secure virtual network on AWS. Terraform CLI is my tool of choice for managing it all, so I can automate the setup and ensure everything stays organized and reproducible.
 What’s Inside the Infrastructure: A VPC in the us-west-1 region with a CIDR block of 10.0.0.0/16—this is the foundation of the network.</description>
     </item>
     <item>
       <title>Fetching Shopify API using AWS Lambda and DynamoDB</title>
-      <link>http://www.nvo.one/posts/shopify-daily-report/</link>
+      <link>http://localhost:1313/posts/shopify-daily-report/</link>
       <pubDate>Mon, 04 Nov 2024 14:45:48 -0800</pubDate>
-      <guid>http://www.nvo.one/posts/shopify-daily-report/</guid>
+      <guid>http://localhost:1313/posts/shopify-daily-report/</guid>
       <description>Hey there! Welcome to my tech blog. I’m excited to share a little project: automating Shopify orders data into a database warehouse and setting up the connection for analysis. I wanted a simple way to fetch data and get real-time insights without all the manual effort. So, I set up AWS Event Scheduler to trigger data retrieval, used AWS Lambda for serverless processing, and chose DynamoDB for storage. To connect DynamoDB to Microsoft Power BI, I used CDATA Universal Software to create an ODBC driver.</description>
     </item>
     <item>
       <title>Send SMS with Twilio using AWS Lambda and API Gateway</title>
-      <link>http://www.nvo.one/posts/twilio-microservice/</link>
+      <link>http://localhost:1313/posts/twilio-microservice/</link>
       <pubDate>Mon, 28 Oct 2024 16:19:06 -0700</pubDate>
-      <guid>http://www.nvo.one/posts/twilio-microservice/</guid>
+      <guid>http://localhost:1313/posts/twilio-microservice/</guid>
       <description>Welcome to my tech blog! Today, I’m excited to take you on my cloud journey with a project which I was inspired from real-world challenge: integrating SMS notifications into a software that had numerous restrictions. I needed a solution to notify users whenever the database was updated. Instead of wrestling with the software’s limitations, I decided to create a microservice that could handle SMS notifications independently. This way, the software team can invoke an API to send SMS messages without worrying about the underlying code and integration complexities.</description>
     </item>
     <item>
+      <title>How I host my website on AWS using Domain from Godaddy.com</title>
+      <link>http://localhost:1313/posts/007-website-hosting/</link>
+      <pubDate>Mon, 29 Jan 2024 11:13:33 -0800</pubDate>
+      <guid>http://localhost:1313/posts/007-website-hosting/</guid>
+      <description>Intro Hey there! When I decided to launch my website, I wanted a reliable and scalable solution. After buying my domain from GoDaddy, I turned to Amazon Web Services (AWS) for hosting. It’s been an exciting journey figuring out the best setup.
+I use Amazon S3 to store my website files, Route 53 for domain name system (DNS) management, and CloudFront to deliver content quickly and securely. It wasn’t all smooth sailing, but the flexibility and power of AWS made it worth it.</description>
+    </item>
+    <item>
+      <title>Using Google SDM API to control Google Nest Camera</title>
+      <link>http://localhost:1313/posts/005-google-sdm/</link>
+      <pubDate>Thu, 18 Jan 2024 11:55:37 -0800</pubDate>
+      <guid>http://localhost:1313/posts/005-google-sdm/</guid>
+      <description>Project name: Croddy
+Nest Camera Guide: https://developers.google.com/nest/device-access/get-started Register Device Access Accept $5 one time fee https://console.nest.google.com/device-access/ Activate Supported Device Activate and setup device with non-commercial google account Setup Google Cloud Platform Use the link on top of the article, scroll down to Setup Google Cloud Platform and click on Enable the API and Get an OAuth 2.0 Client ID Select Webserver &amp;gt; Enter https://www.google.com &amp;gt; copy Client ID and download the file Create a Device Access project Go to Device Access &amp;gt; Create new project &amp;gt; paste Client ID &amp;gt; disable event Once done, copy Project ID down Now you have to link your developer account with user account</description>
+    </item>
+    <item>
+      <title>build AWS network infrastructure and deploy resources using Terraform</title>
+      <link>http://localhost:1313/posts/004-automate-iac/</link>
+      <pubDate>Tue, 16 Jan 2024 11:32:20 -0800</pubDate>
+      <guid>http://localhost:1313/posts/004-automate-iac/</guid>
+      <description>1. Source Code https://github.com/nhatvo1502/Automate-IaC/tree/main 2. What the code does 2.1. create-resource.yml configure aws credential verify aws credential verify aws s3 permission create s3 bucket for terraform backend copy file from GH to runner verify terraform file terraform init -&amp;gt; apply 2.2 destroy-resource.yml configure aws credential copy file from GH to runner verify terraform file terraform init -&amp;gt; destroy empty s3 backend bucket delete-bucket 2.3 main.tf configure s3 as backend create an s3 bucket create a keypair using a public key from GitHub Secret AMI lookup create VPC create a subnet create a network interface create EC2 instance 3.</description>
+    </item>
+    <item>
+      <title>Avoid Phishing and Malicious Emails in 2024</title>
+      <link>http://localhost:1313/posts/003-phishing-email/</link>
+      <pubDate>Tue, 16 Jan 2024 09:26:03 -0800</pubDate>
+      <guid>http://localhost:1313/posts/003-phishing-email/</guid>
+      <description>1. Verify sender&amp;rsquo;s email address The sender&amp;rsquo;s origin contains 2 parts: The display name and email@domain.com.
+Nhat Vo &amp;lt;nhat.vo@awakenservices.net&amp;gt; Display name: Nhat Vo Email address: nhat.vo@awakenservices.net The display name can be forged while email address cannot.
+This is an example of phishing emails: Nhat Vo &amp;lt;nhat.vo@123456.com&amp;gt; Display name: Nhat Vo Email address: nhat.vo@12345.com 2. Don&amp;rsquo;t Trust Unsolicited Emails Be cautious of unexpected emails, especially those requesting personal information or urging you to click on links.</description>
+    </item>
+    <item>
+      <title>get aws credential report using github action</title>
+      <link>http://localhost:1313/posts/002-aws-credential-report/</link>
+      <pubDate>Mon, 15 Jan 2024 10:10:29 -0800</pubDate>
+      <guid>http://localhost:1313/posts/002-aws-credential-report/</guid>
+      <description>I. Introduction This project is inspired by one of my dear friend. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It&amp;rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.
+II. Our Game-plan We will leverage Github Action to execute a set of commands to generate AWS Credential Report, download it, decode, pipe the content into csv file and finally copy to a existing S3 bucket.</description>
+    </item>
+    <item>
       <title>About Me</title>
-      <link>http://www.nvo.one/posts/about-me/</link>
+      <link>http://localhost:1313/posts/about-me/</link>
       <pubDate>Mon, 08 Jan 2024 16:40:52 -0800</pubDate>
-      <guid>http://www.nvo.one/posts/about-me/</guid>
+      <guid>http://localhost:1313/posts/about-me/</guid>
       <description>&amp;ldquo;Humility is not thinking less of yourself, it&amp;rsquo;s thinking of yourself less.&amp;rdquo;
 Rick Warren </description>
     </item>

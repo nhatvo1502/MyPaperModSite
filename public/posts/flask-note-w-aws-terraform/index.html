@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Hosting a Python Flask Note Using AWS Services, Terraform, Github Actions | nathaniel</title>
+<meta name="keywords" content="">
+<meta name="description" content="Deploy infrastructure using Terraform ¹, AWS Lambda ², and GitHub Actions ³. During a conversation with a close friend in Australia, I was inspired by the idea of using a lightweight framework like Flask to build a cloud application. Thanks @terryduong for the inspiration and support for this project.
+Check out my project on GitHub
+Stage 0: Game plan I split this project into five stages.
+Stage 1: Creating the app Stage 2: Host locally Stage 3: Hosting on AWS using Console Stage 4: Hosting on AWS using Terraform Stage 5: Automate the deployment using Terraform and Github Actions A Reference List at the end of this page includes all the documents I consulted throughout this project.">
+<meta name="author" content="Nhat Vo">
+<link rel="canonical" href="http://localhost:1313/posts/flask-note-w-aws-terraform/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.b609c58d5c11bb90b1a54e04005d74ad1ddf22165eb79f5533967e57df9c3b50.css" integrity="sha256-tgnFjVwRu5CxpU4EAF10rR3fIhZet59VM5Z&#43;V9&#43;cO1A=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/flask-note-w-aws-terraform/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class=" dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="nathaniel (Alt + H)">nathaniel</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/posts/about-me" title="about me">
+                    <span>about me</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/posts" title="posts">
+                    <span>posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories" title="categories">
+                    <span>categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/posts/search" title="search (Alt &#43; /)" accesskey=/>
+                    <span>search</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Hosting a Python Flask Note Using AWS Services, Terraform, Github Actions
+    </h1>
+    <div class="post-meta"><span title='2025-03-07 07:54:28 -0800 PST'>March 7, 2025</span>&nbsp;·&nbsp;11 min&nbsp;·&nbsp;Nhat Vo
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#stage-0-game-plan" aria-label="Stage 0: Game plan">Stage 0: Game plan</a></li>
+                <li>
+                    <a href="#stage-1-creating-nnote" aria-label="Stage 1: Creating Nnote">Stage 1: Creating Nnote</a></li>
+                <li>
+                    <a href="#stage-2-hosting-locally" aria-label="Stage 2: Hosting Locally">Stage 2: Hosting Locally</a><ul>
+                        
+                <li>
+                    <a href="#2a-workflows" aria-label="2a. Workflows:">2a. Workflows:</a></li>
+                <li>
+                    <a href="#2b-testing" aria-label="2b. Testing:">2b. Testing:</a></li></ul>
+                </li>
+                <li>
+                    <a href="#stage-3-hosting-on-aws-using-console" aria-label="Stage 3: Hosting on AWS using Console">Stage 3: Hosting on AWS using Console</a><ul>
+                        
+                <li>
+                    <a href="#3a-workflows" aria-label="3a. Workflows:">3a. Workflows:</a></li>
+                <li>
+                    <a href="#3b-debug" aria-label="3b. Debug:">3b. Debug:</a></li>
+                <li>
+                    <a href="#3c-testing" aria-label="3c. Testing:">3c. Testing:</a></li></ul>
+                </li>
+                <li>
+                    <a href="#stage-4-hosting-on-aws-using-terraform" aria-label="Stage 4: Hosting on AWS using Terraform">Stage 4: Hosting on AWS using Terraform</a></li>
+                <li>
+                    <a href="#stage-5-automate-deployment-using-github-actions" aria-label="Stage 5: Automate deployment using Github Actions">Stage 5: Automate deployment using Github Actions</a><ul>
+                        
+                <li>
+                    <a href="#5a-github-actions-workflow" aria-label="5a. Github Actions Workflow:">5a. Github Actions Workflow:</a></li>
+                <li>
+                    <a href="#5b-debugging" aria-label="5b. Debugging:">5b. Debugging:</a></li>
+                <li>
+                    <a href="#references" aria-label="References">References</a><ul>
+                        
+                <li>
+                    <a href="#ref1" aria-label="[1] MYSQL vs SQLite">[1] MYSQL vs SQLite</a></li>
+                <li>
+                    <a href="#ref2" aria-label="[2] Gunicorn">[2] Gunicorn</a></li>
+                <li>
+                    <a href="#ref2" aria-label="[3] AWS ECS">[3] AWS ECS</a></li>
+                <li>
+                    <a href="#ref2" aria-label="[4] AWS OICD">[4] AWS OICD</a></li>
+                <li>
+                    <a href="#ref2" aria-label="[5] GitHub Actions and AWS OICD">[5] GitHub Actions and AWS OICD</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>Deploy infrastructure using Terraform <a href="#ref1">¹</a>, AWS Lambda <a href="#ref2">²</a>, and GitHub Actions <a href="#ref3">³</a>.
+<img loading="lazy" src="/images/nnote/python-website.drawio.png" alt="image"  />
+</p>
+<p>During a conversation with a close friend in Australia, I was inspired by the idea of using a lightweight framework like Flask to build a cloud application. Thanks @terryduong for the inspiration and support for this project.</p>
+<p>Check out my project on <a href="https://github.com/nhatvo1502/python-website">GitHub</a></p>
+<h1 id="stage-0-game-plan">Stage 0: Game plan<a hidden class="anchor" aria-hidden="true" href="#stage-0-game-plan">#</a></h1>
+<p>I split this project into <strong>five stages</strong>.</p>
+<ol>
+<li>Stage 1: Creating the app</li>
+<li>Stage 2: Host locally</li>
+<li>Stage 3: Hosting on AWS using Console</li>
+<li>Stage 4: Hosting on AWS using Terraform</li>
+<li>Stage 5: Automate the deployment using Terraform and Github Actions</li>
+</ol>
+<p>A <strong>Reference List</strong> at the end of this page includes all the documents I consulted throughout this project.</p>
+<h1 id="stage-1-creating-nnote">Stage 1: Creating Nnote<a hidden class="anchor" aria-hidden="true" href="#stage-1-creating-nnote">#</a></h1>
+<p>Thanks to Tech With Tim for this details <a href="https://www.youtube.com/watch?v=dam0GPOAvVI&amp;t=407s&amp;ab_channel=TechWithTim">tutorial</a></p>
+<p>I used a <strong>Python virtual environment</strong> to track all dependencies via <code>requirements.txt</code>, facilitating the subsequent creation of a Docker image.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python -m venv .<span style="color:#ae81ff">\v</span>env
+</span></span><span style="display:flex;"><span>./env/scripts/activate
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>pip freeze &gt; requirements.txt
+</span></span></code></pre></div><p><br>
+After becoming familiar with Python Flask, I challenged myself to add some features to this app. A <strong>password reset function</strong> seemed useful.</p>
+<p><br>
+First, I added a new button to the nav-bar in <code>base.html</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span><span style="color:#75715e">&lt;!--website/templates/base.html--&gt;</span>
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;collapse navbar-collapse&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;navbar&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>  &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;navbar-nav&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>    {% if user.is_authenticated %}
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;nav-item nav-link&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;home&#34;</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/&#34;</span>&gt;Home&lt;/<span style="color:#f92672">a</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;nav-item nav-link&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;resetPassword&#34;</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/reset-password&#34;</span>
+</span></span><span style="display:flex;"><span>      &gt;Reset Password&lt;/<span style="color:#f92672">a</span>
+</span></span><span style="display:flex;"><span>    &gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;nav-item nav-link&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;logout&#34;</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/logout&#34;</span>&gt;Logout&lt;/<span style="color:#f92672">a</span>&gt;
+</span></span><span style="display:flex;"><span>    {% else %}
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;nav-item nav-link&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;login&#34;</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/login&#34;</span>&gt;Login&lt;/<span style="color:#f92672">a</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;nav-item nav-link&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;signUp&#34;</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/sign-up&#34;</span>&gt;Sign Up&lt;/<span style="color:#f92672">a</span>&gt;
+</span></span><span style="display:flex;"><span>    {% endif %}
+</span></span><span style="display:flex;"><span>  &lt;/<span style="color:#f92672">div</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">div</span>&gt;
+</span></span></code></pre></div><p><br>
+Then, I created a new page, <code>reset-password.html</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span><span style="color:#75715e">&lt;!--website/templates/reset-password.html--&gt;</span>
+</span></span><span style="display:flex;"><span>{% extends &#34;base.html&#34; %} {% block title %}Reset Password{% endblock %} {% block
+</span></span><span style="display:flex;"><span>content %}
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">form</span> <span style="color:#a6e22e">method</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;POST&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>  &lt;<span style="color:#f92672">h3</span> <span style="color:#a6e22e">align</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;center&#34;</span>&gt;Reset Password&lt;/<span style="color:#f92672">h3</span>&gt;
+</span></span><span style="display:flex;"><span>  &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;form-group&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">label</span> <span style="color:#a6e22e">for</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;password1&#34;</span>&gt;Current Password&lt;/<span style="color:#f92672">label</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">input</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;password&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;form-control&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;current_password&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;current_password&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">placeholder</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Enter current password&#34;</span>
+</span></span><span style="display:flex;"><span>    /&gt;
+</span></span><span style="display:flex;"><span>  &lt;/<span style="color:#f92672">div</span>&gt;
+</span></span><span style="display:flex;"><span>  &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;form-group&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">label</span> <span style="color:#a6e22e">for</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;password2&#34;</span>&gt;New Password&lt;/<span style="color:#f92672">label</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">input</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;password&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;form-control&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;new_password1&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;new_password1&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">placeholder</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Enter new password&#34;</span>
+</span></span><span style="display:flex;"><span>    /&gt;
+</span></span><span style="display:flex;"><span>  &lt;/<span style="color:#f92672">div</span>&gt;
+</span></span><span style="display:flex;"><span>  &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;form-group&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">label</span> <span style="color:#a6e22e">for</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;password2&#34;</span>&gt;New Password (Confirm)&lt;/<span style="color:#f92672">label</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">input</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;password&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;form-control&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;new_password2&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;new_password2&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">placeholder</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Re-enter new password&#34;</span>
+</span></span><span style="display:flex;"><span>    /&gt;
+</span></span><span style="display:flex;"><span>  &lt;/<span style="color:#f92672">div</span>&gt;
+</span></span><span style="display:flex;"><span>  &lt;<span style="color:#f92672">br</span> /&gt;
+</span></span><span style="display:flex;"><span>  &lt;<span style="color:#f92672">button</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;submit&#34;</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;btn btn-primary&#34;</span>&gt;Submit&lt;/<span style="color:#f92672">button</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">form</span>&gt;
+</span></span><span style="display:flex;"><span>{% endblock %}
+</span></span></code></pre></div><p><br>
+Finally, I added a new route to <code>auth.py</code> to handle the logic.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#website/auth.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@auth.route</span>(<span style="color:#e6db74">&#39;/reset-password&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;GET&#39;</span>, <span style="color:#e6db74">&#39;POST&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">reset_password</span>():
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> request<span style="color:#f92672">.</span>method <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;POST&#39;</span>:
+</span></span><span style="display:flex;"><span>		current_password <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>form<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;current_password&#39;</span>)
+</span></span><span style="display:flex;"><span>		new_password1 <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>form<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;new_password1&#39;</span>)
+</span></span><span style="display:flex;"><span>		new_password2 <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>form<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;new_password2&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> check_password_hash(current_user<span style="color:#f92672">.</span>password, current_password) <span style="color:#f92672">==</span> <span style="color:#66d9ef">False</span>:
+</span></span><span style="display:flex;"><span>			flash(<span style="color:#e6db74">&#39;Incorrect password!&#39;</span>, category<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;error&#39;</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">if</span> len(new_password1) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">7</span>:
+</span></span><span style="display:flex;"><span>				flash(<span style="color:#e6db74">&#39;Password must be at least 7 characters.&#39;</span>, category<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;error&#39;</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">elif</span> new_password1<span style="color:#f92672">!=</span>new_password2:
+</span></span><span style="display:flex;"><span>				flash(<span style="color:#e6db74">&#39;Password don</span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74">t match&#39;</span>, category<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;error&#39;</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>				current_user<span style="color:#f92672">.</span>password <span style="color:#f92672">=</span> generate_password_hash(new_password1, method<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;pbkdf2:sha256&#39;</span>)
+</span></span><span style="display:flex;"><span>				db<span style="color:#f92672">.</span>session<span style="color:#f92672">.</span>commit()
+</span></span><span style="display:flex;"><span>				flash(<span style="color:#e6db74">&#39;Password  reset succesfully! Please login again.&#39;</span>)
+</span></span><span style="display:flex;"><span>				logout_user()
+</span></span><span style="display:flex;"><span>				<span style="color:#66d9ef">return</span> redirect(url_for(<span style="color:#e6db74">&#39;auth.login&#39;</span>))
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> render_template(<span style="color:#e6db74">&#39;reset_password.html&#39;</span>, user<span style="color:#f92672">=</span>current_user)
+</span></span></code></pre></div><h1 id="stage-2-hosting-locally">Stage 2: Hosting Locally<a hidden class="anchor" aria-hidden="true" href="#stage-2-hosting-locally">#</a></h1>
+<h2 id="2a-workflows">2a. Workflows:<a hidden class="anchor" aria-hidden="true" href="#2a-workflows">#</a></h2>
+<ol>
+<li>Create DB</li>
+<li>Run the app with Python</li>
+<li>Integrate <em>Gunicorn</em></li>
+<li>Build app as Docker</li>
+</ol>
+<p><strong>MySQL Server</strong>
+SQLite is lightweight and good for small project but AWS doesn&rsquo;t support this engine officially. I chose MySQL because it&rsquo;s cost-effective, user friendly and supported by AWS <strong>[1]</strong>.</p>
+<p>Install <a href="https://dev.mysql.com/downloads/installer/">MySQL</a> and <a href="https://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></p>
+<p><em>Username:</em> <code>root</code> <br>
+<em>Password:</em> <code>password</code> <br>
+<img loading="lazy" src="/images/nnote/mysqlworkbench.png" alt="image"  />
+</p>
+<p><strong>Update Connection String and Database Authentication</strong>
+To have nnote-app interact with MySQL server, I used <code>sqlalchemy</code></p>
+<p><br>
+Install <code>sqlalchemy package</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>pip install sqlalchemy_utils
+</span></span></code></pre></div><p><br>
+Modified <code>__init__.py</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#website/__init__.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sqlalchemy_utils <span style="color:#f92672">import</span> database_exists, create_database
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#------------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>db <span style="color:#f92672">=</span> SQLAlchemy()
+</span></span><span style="display:flex;"><span>DB_USERNAME <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;root&#34;</span>
+</span></span><span style="display:flex;"><span>DB_PASSWORD <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;password&#34;</span>
+</span></span><span style="display:flex;"><span>DB_HOST <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;host.docker.internal&#34;</span> <span style="color:#75715e"># run from inside Docker</span>
+</span></span><span style="display:flex;"><span>DB_NAME <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;nnote_database&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#------------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">create</span>():
+</span></span><span style="display:flex;"><span>	app <span style="color:#f92672">=</span> Flask(__name__)
+</span></span><span style="display:flex;"><span>	app<span style="color:#f92672">.</span>config[<span style="color:#e6db74">&#39;SECRET_KEY&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;mysecretkey&#39;</span>
+</span></span><span style="display:flex;"><span>	url <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;mysql+pymysql://</span><span style="color:#e6db74">{</span>DB_USERNAME<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>DB_PASSWORD<span style="color:#e6db74">}</span><span style="color:#e6db74">@</span><span style="color:#e6db74">{</span>DB_HOST<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>DB_NAME<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>	app<span style="color:#f92672">.</span>config[<span style="color:#e6db74">&#39;SQLALCHEMY_DATABASE_URI&#39;</span>] <span style="color:#f92672">=</span> url
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#------------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">create_db</span>(url, app):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Check if the database exists, if not, create it</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#39;create_database is running&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> database_exists(url):
+</span></span><span style="display:flex;"><span>        create_database(url)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Use the app context to create all tables</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> app<span style="color:#f92672">.</span>app_context():
+</span></span><span style="display:flex;"><span>            db<span style="color:#f92672">.</span>create_all()
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#39;Created Database!&#39;</span>)
+</span></span></code></pre></div><p><br>
+I will do a quick test to see if my <strong>nnote-app</strong> can interact with the DB</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python .<span style="color:#ae81ff">\m</span>ain.py
+</span></span></code></pre></div><p>&hellip; and voila, the <strong>nnote-app</strong> succesfully connect to MySQL Database on local and created 2 tables: <code>user</code> and <code>note</code> just as how I wanted.
+<img loading="lazy" src="/images/nnote/localdb-test1.png" alt="image"  />
+</p>
+<p>Now, all we need to to pack all the dependencies into <code>requirements.txt</code> and get ready to build a Docker image. But before that, I need <strong>Gunicorn</strong></p>
+<p><strong>Gunicorn</strong></p>
+<p>While Flask is great for development, its server is not suitable for concurrent traffics in production envrinonment. I choose Gunicorn <strong>[2]</strong> to handle Flask&rsquo;s shortcoming.</p>
+<p><br>
+To install&hellip;</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>pip install gunicorn
+</span></span></code></pre></div><p><br>
+export dependencies&hellip;</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>pip freeze &gt; requirements.txt
+</span></span></code></pre></div><p><strong>Docker</strong>
+Install <a href="https://docs.docker.com/desktop/setup/install/windows-install/">Docker</a></p>
+<p>I create <code>Dockerfile</code> under <code>.\</code> using <code>gunicorn</code> as my WGSI</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> python:3.11</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">WORKDIR</span><span style="color:#e6db74"> /app</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> . .<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> pip3 install -r requirements.txt<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">EXPOSE</span><span style="color:#e6db74"> 5000</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;gunicorn&#34;</span>, <span style="color:#e6db74">&#34;-b&#34;</span>, <span style="color:#e6db74">&#34;0.0.0.0:5000&#34;</span>, <span style="color:#e6db74">&#34;website:create_app()&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><h2 id="2b-testing">2b. Testing:<a hidden class="anchor" aria-hidden="true" href="#2b-testing">#</a></h2>
+<p>build and run Docker</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker build -t nnote-app .
+</span></span><span style="display:flex;"><span>docker run -p 5000:5000 nnote-app
+</span></span></code></pre></div><p><br>
+Docker Image is built succesfully, since I exposed <code>port 5000</code> from inside the Docker container to <code>port 5000</code> outside of the container, the correct URL to my nnote-app should be <code>localhost:5000</code> or <code>http://127.0.0.1:5000</code>
+<img loading="lazy" src="/images/nnote/docker2.png" alt="image"  />
+</p>
+<p><strong>Stage 2 is completed!</strong> I&rsquo;m excited for the next one &ndash; <strong>AWS Cloud</strong>.</p>
+<h1 id="stage-3-hosting-on-aws-using-console">Stage 3: Hosting on AWS using Console<a hidden class="anchor" aria-hidden="true" href="#stage-3-hosting-on-aws-using-console">#</a></h1>
+<h2 id="3a-workflows">3a. Workflows:<a hidden class="anchor" aria-hidden="true" href="#3a-workflows">#</a></h2>
+<p>What resources that I need on AWS: a MySQL Server, ECR-&gt;ECS-&gt;Task Definitaion-&gt;Service-&gt;Task(point back to my container image on ECR)</p>
+<p><strong>Database</strong></p>
+<ol>
+<li>Create a <strong>MySQL db</strong> by navigating to <em>AWS Console</em> -&gt; <em>Amazon RDS</em> -&gt; Select <em>Create database</em></li>
+<li>Configure:
+<ul>
+<li>Engine options = <code>MySQL</code></li>
+<li>Templates = <code>Free tier</code></li>
+<li>Master username = <code>admin</code></li>
+<li>Master password = <code>password</code></li>
+<li>Public access = <code>Yes</code></li>
+</ul>
+</li>
+<li>Click <em>Create database</em></li>
+<li>Upon the database creation, I grab the <code>endpoint</code> from AWS RDS console and use <strong>MySQL Workbench</strong> test for connection and authentication.</li>
+</ol>
+<p><img loading="lazy" src="/images/nnote/aws-rds-1.png" alt="image"  />
+</p>
+<ol start="5">
+<li>Update nnote-app with <code>endpoint</code>, <code>DB_USERNAME=&quot;admin&quot;</code> and <code>DB_PASSWORD=&quot;password&quot;</code></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#website/__init__.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#------------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>db <span style="color:#f92672">=</span> SQLAlchemy()
+</span></span><span style="display:flex;"><span>DB_USERNAME <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;admin&#34;</span>
+</span></span><span style="display:flex;"><span>DB_PASSWORD <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;password&#34;</span>
+</span></span><span style="display:flex;"><span>DB_HOST <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;AWS-RDS-Endpoint&#34;</span> <span style="color:#75715e"># run from inside Docker</span>
+</span></span><span style="display:flex;"><span>DB_NAME <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;nnote_database&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#------------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">create</span>():
+</span></span><span style="display:flex;"><span>	app <span style="color:#f92672">=</span> Flask(__name__)
+</span></span><span style="display:flex;"><span>	app<span style="color:#f92672">.</span>config[<span style="color:#e6db74">&#39;SECRET_KEY&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;mysecretkey&#39;</span>
+</span></span><span style="display:flex;"><span>	url <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;mysql+pymysql://</span><span style="color:#e6db74">{</span>DB_USERNAME<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>DB_PASSWORD<span style="color:#e6db74">}</span><span style="color:#e6db74">@</span><span style="color:#e6db74">{</span>DB_HOST<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>DB_NAME<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>	app<span style="color:#f92672">.</span>config[<span style="color:#e6db74">&#39;SQLALCHEMY_DATABASE_URI&#39;</span>] <span style="color:#f92672">=</span> url
+</span></span></code></pre></div><p><strong>ECR</strong></p>
+<ol>
+<li>To create a <strong>Elastic Container Repo</strong> <strong>[3]</strong>, navigate to <em>AWS Console</em> -&gt; <em>Amazon Elastic Container Registry</em> -&gt; <em>repository</em> -&gt; <em>Create depository</em></li>
+<li>Configure:
+<ul>
+<li>Repository name = <code>nnote-ecr/app</code></li>
+<li>Image tag mutability = <code>Mutable</code></li>
+<li>Encryption = <code>AES-256</code></li>
+</ul>
+</li>
+<li><em>Create</em></li>
+<li>Click our repo <em>nnote-ecr.app</em> -&gt; <em>View push commands</em> -&gt; follow the instruction from AWS to push my local Docker image to AWS ECR
+<img loading="lazy" src="/images/nnote/ecr-push.png" alt="image"  />
+</li>
+<li>I also grabbed the the Repo URI on the way out for later</li>
+</ol>
+<p><strong>ECS Cluster</strong></p>
+<ol>
+<li>Navigate to <em>AWS Console</em> -&gt; <em>Amazon Elastic Container Service</em> -&gt; <em>Create cluster</em></li>
+<li>Configure:
+<ul>
+<li>Cluster name = <code>nnote-us-east-1-cluster</code></li>
+<li>Infrastructure = <code>AWS FarGate</code></li>
+</ul>
+</li>
+<li><em>Create</em></li>
+</ol>
+<p><strong>ECS Task definition</strong></p>
+<ol>
+<li>In <em>AWS Elastic Container Service</em> Console -&gt; <em>Task Definition</em></li>
+<li>Configure - Infrastructure:
+<ul>
+<li>Task definition family = <code>nnote-td</code></li>
+<li>Launch Type = <code>AWS FarGate</code></li>
+<li>Task execution role = <code>ecsTaskExecutionRole</code></li>
+</ul>
+</li>
+<li>Configure - Container - 1:
+<ul>
+<li>Name = <code>nnote-container</code></li>
+<li>Image URI = ${ERC&rsquo;s URI from above}:latest</li>
+<li>Essential container = <code>Yes</code></li>
+<li>Container port = <code>80</code></li>
+</ul>
+</li>
+</ol>
+<p><strong>ECS Cluster Service</strong></p>
+<ol>
+<li>From <em>AWS Elastic Container Service</em> console -&gt; <em>Cluster</em></li>
+<li>Click on our cluster <code>nnote-us-east-1-cluster</code> -&gt; under <em>Services</em> tab -&gt; <em>Create</em></li>
+<li>Configure:
+<ul>
+<li>Launch type = <code>FARGATE</code></li>
+<li>Application type = <code>Service</code></li>
+<li>Family = <code>nnote-td</code></li>
+<li>Service name = <code>nnote-service</code></li>
+</ul>
+</li>
+<li><em>Create</em></li>
+</ol>
+<p>If everything works as intented, our task will turn 1/1 shortly</p>
+<p><img loading="lazy" src="/images/nnote/ecs-service-1-wait.png" alt="image"  />
+</p>
+<p>Nothing good come easily. Something wrong with my image that cause my task to exit. Time for some troubleshootings.
+<img loading="lazy" src="/images/nnote/ecs-service-1-error.png" alt="image"  />
+
+<img loading="lazy" src="/images/nnote/ecs-service-1-error-1.png" alt="image"  />
+</p>
+<h2 id="3b-debug">3b. Debug:<a hidden class="anchor" aria-hidden="true" href="#3b-debug">#</a></h2>
+<p>I went back to my local computer to run <code>docker run</code> to see if my image is still working properly and receive this error
+<img loading="lazy" src="/images/nnote/ecs-service-1-error-2.png" alt="image"  />
+</p>
+<p><br>
+Error <code>&quot;Access denied for user 'root'@'74.212.237.134' (using password: YES)&quot;</code> means db authentication isn&rsquo;t configured properly. I quickly check <code>__init__.py</code> and found my error. I rebuilt the container and run it locally. The error has gone.
+<img loading="lazy" src="/images/nnote/ecs-service-1-error-fixed.png" alt="image"  />
+</p>
+<p><br>
+I push it to my ECR Repo and manually redeploy the Cluster service:</p>
+<ol>
+<li>Navigate <em>AWS Elastic Container Service</em> console -&gt; Cluster</li>
+<li><em>nnote-us-east-1-cluster</em> -&gt; <em>Services</em> -&gt; <em>nnote-service</em></li>
+<li>Switch to <em>Tasks</em> tab -&gt; Under <em>Update service</em> drop-down arrow &gt; select <em>Force new deployment</em></li>
+</ol>
+<p>Finger cross&hellip;
+<img loading="lazy" src="/images/nnote/ecs-service-2-wait.png" alt="image"  />
+</p>
+<p>Voila! The image seems to be interacting with the Database without any issue now.
+<img loading="lazy" src="/images/nnote/ecs-service-2-success.png" alt="image"  />
+</p>
+<h2 id="3c-testing">3c. Testing:<a hidden class="anchor" aria-hidden="true" href="#3c-testing">#</a></h2>
+<p>Let&rsquo;s test if nnote-app, first, we need the <em>container public IP address</em></p>
+<ol>
+<li>Amazon <em>Elastic Container Service</em> -&gt; <em>Clusters</em> -&gt; <em>nnote-us-east-1-cluster</em> -&gt; <em>Services</em> -&gt; <em>nnote-service</em></li>
+<li>Switch to <em>Tasks</em> tab -&gt; Select task -&gt; switch to <em>Networking</em></li>
+<li>Copy Public Ip address</li>
+<li>Paste on my browser and add <code>port 5000</code></li>
+</ol>
+<p>I can access my login screen!
+<img loading="lazy" src="/images/nnote/stage2-complete-1.png" alt="image"  />
+</p>
+<p><br>
+Let&rsquo;s try sign-up&hellip;
+<img loading="lazy" src="/images/nnote/stage2-complete-1-sign-up.png" alt="image"  />
+</p>
+<p><br>
+Then add some note&hellip;
+<img loading="lazy" src="/images/nnote/stage2-complete-1-note.png" alt="image"  />
+</p>
+<p><br>
+Let&rsquo;s check our <code>nnote_database.user</code> on AWS RDS Database by navigate to MySQL Workbench &gt; expand <code>nnote_database</code> &gt; select <code>user</code> &gt; enter this command <code>SELECT * FROM nnote_database.user</code>
+<img loading="lazy" src="/images/nnote/stage2-complete-1-db-user.png" alt="image"  />
+</p>
+<p><br>
+How about <code>nnote_database.note</code>? <code>SELECT * FROM nnote_database.note</code>
+<img loading="lazy" src="/images/nnote/stage2-complete-1-db-note.png" alt="image"  />
+</p>
+<p>Everything seems to be working as intented. But deploying this project involves a lot of manual work and the authentication between services are not secure. Let&rsquo;s streamline the CI/CD and enhance the authentication method at <strong>Stage 4</strong></p>
+<h1 id="stage-4-hosting-on-aws-using-terraform">Stage 4: Hosting on AWS using Terraform<a hidden class="anchor" aria-hidden="true" href="#stage-4-hosting-on-aws-using-terraform">#</a></h1>
+<p>I automate Stage 3 using Terraform but I still have to build and push Docker manually. I add my own VPC in <code>network.tf</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#75715e"># terraform/network.tf
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_vpc&#34; &#34;nnote&#34;</span> {
+</span></span><span style="display:flex;"><span>  cidr_block           <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">vpc_cidr</span>
+</span></span><span style="display:flex;"><span>  enable_dns_hostnames <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  tags <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    Name <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">vpc_name</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_internet_gateway&#34; &#34;nnote&#34;</span> {
+</span></span><span style="display:flex;"><span>  vpc_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_vpc</span>.<span style="color:#66d9ef">nnote</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  tags <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    Name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;nnote_igw&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_subnet&#34; &#34;s1&#34;</span> {
+</span></span><span style="display:flex;"><span>  vpc_id            <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_vpc</span>.<span style="color:#66d9ef">nnote</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  cidr_block        <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">s1_cidr</span>
+</span></span><span style="display:flex;"><span>  availability_zone <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">s1_az</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  tags <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    Name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;nnote_vpc_s1&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_subnet&#34; &#34;s2&#34;</span> {
+</span></span><span style="display:flex;"><span>  vpc_id            <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_vpc</span>.<span style="color:#66d9ef">nnote</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  cidr_block        <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">s2_cidr</span>
+</span></span><span style="display:flex;"><span>  availability_zone <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">s2_az</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  tags <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    Name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;nnote_vpc_s2&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_route_table&#34; &#34;nnote&#34;</span> {
+</span></span><span style="display:flex;"><span>  vpc_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_vpc</span>.<span style="color:#66d9ef">nnote</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">route</span> {
+</span></span><span style="display:flex;"><span>    cidr_block <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;0.0.0.0/0&#34;</span>
+</span></span><span style="display:flex;"><span>    gateway_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_internet_gateway</span>.<span style="color:#66d9ef">nnote</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  tags <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    Name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;nnote_rt&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  depends_on <span style="color:#f92672">=</span> [<span style="color:#66d9ef">aws_internet_gateway</span>.<span style="color:#66d9ef">nnote</span>]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_route_table_association&#34; &#34;assoc1&#34;</span> {
+</span></span><span style="display:flex;"><span>  route_table_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_route_table</span>.<span style="color:#66d9ef">nnote</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  subnet_id      <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_subnet</span>.<span style="color:#66d9ef">s1</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_route_table_association&#34; &#34;assoc2&#34;</span> {
+</span></span><span style="display:flex;"><span>  route_table_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_route_table</span>.<span style="color:#66d9ef">nnote</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  subnet_id      <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_subnet</span>.<span style="color:#66d9ef">s2</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><br>
+and update <code>variables.tf</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#75715e"># terraform/variables.tf
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"># NETWORK
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">variable</span> <span style="color:#e6db74">&#34;vpc_name&#34;</span> {
+</span></span><span style="display:flex;"><span>  default <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;nnote_vpc&#34;</span>
+</span></span><span style="display:flex;"><span>  type    <span style="color:#f92672">=</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">variable</span> <span style="color:#e6db74">&#34;vpc_cidr&#34;</span> {
+</span></span><span style="display:flex;"><span>  default <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;10.0.0.0/16&#34;</span>
+</span></span><span style="display:flex;"><span>  type    <span style="color:#f92672">=</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">variable</span> <span style="color:#e6db74">&#34;s1_cidr&#34;</span> {
+</span></span><span style="display:flex;"><span>  default <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;10.0.1.0/24&#34;</span>
+</span></span><span style="display:flex;"><span>  type    <span style="color:#f92672">=</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">variable</span> <span style="color:#e6db74">&#34;s1_az&#34;</span> {
+</span></span><span style="display:flex;"><span>  default <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;us-east-1a&#34;</span>
+</span></span><span style="display:flex;"><span>  type    <span style="color:#f92672">=</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">variable</span> <span style="color:#e6db74">&#34;s2_cidr&#34;</span> {
+</span></span><span style="display:flex;"><span>  default <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;10.0.2.0/24&#34;</span>
+</span></span><span style="display:flex;"><span>  type    <span style="color:#f92672">=</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">variable</span> <span style="color:#e6db74">&#34;s2_az&#34;</span> {
+</span></span><span style="display:flex;"><span>  default <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;us-east-1b&#34;</span>
+</span></span><span style="display:flex;"><span>  type    <span style="color:#f92672">=</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">variable</span> <span style="color:#e6db74">&#34;vpc_sg_name&#34;</span> {
+</span></span><span style="display:flex;"><span>  default <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;nnote_vpc_sg&#34;</span>
+</span></span><span style="display:flex;"><span>  type    <span style="color:#f92672">=</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This stage went smoothly and I didn&rsquo;t encounter any issue which I was happy to cut it short to the <strong>Final Stage</strong></p>
+<h1 id="stage-5-automate-deployment-using-github-actions">Stage 5: Automate deployment using Github Actions<a hidden class="anchor" aria-hidden="true" href="#stage-5-automate-deployment-using-github-actions">#</a></h1>
+<p>The goal of this stage is to transform my app into a ready-to-deploy application that can be use by anyone</p>
+<h2 id="5a-github-actions-workflow">5a. Github Actions Workflow:<a hidden class="anchor" aria-hidden="true" href="#5a-github-actions-workflow">#</a></h2>
+<ol>
+<li><strong>Copy repo</strong> to Github Actions Runner</li>
+<li><strong>AWS OICD</strong> to authenticate runner with AWS</li>
+<li><strong>Create S3 bucket</strong> to store Terraform backend tfstate file</li>
+<li><strong>Deploy Terraform</strong></li>
+<li><strong>Capture Terraform Output</strong></li>
+<li><strong>Login AWS ECR</strong></li>
+<li><strong>Build and Push Docker Image</strong> to AWS ECR</li>
+<li><strong>Force ECS Cluster Service&rsquo;s redeployment</strong></li>
+<li><strong>Roll back if fail()</strong> so that I don&rsquo;t have to clean up AWS Resources if something goes wrong, this is optional and I figure it would make my life so much better for testing</li>
+</ol>
+<p><strong>AWS OICD</strong></p>
+<p>I read <strong>[4]</strong> <strong>[5]</strong> to setup AWS OICD role. It seems very straight forward so I won&rsquo;t document these steps. You will need to configre this from your AWS IAM using your Github token.</p>
+<p><br>
+<strong>Injecting Secrets to Docker Image</strong></p>
+<p>I configure <code>deploy.yml</code> to pick up <code>DB_NAME</code>, <code>DB_USERNAME</code>, and <code>DB_PASSWORD</code> from the Github Actions Secrets.</p>
+<p>To setup <strong>GHA Secrets</strong></p>
+<ol>
+<li>Navigate to your Github repo</li>
+<li>Select <em>Settings</em> &gt; <em>Secrets and variables</em></li>
+<li>Configure 3 variable with the exact name as below:
+<ul>
+<li><code>DB_NAME</code>= <em>your-db-name</em> (can be anything, this does not matter)</li>
+<li><code>DB_USERNAME</code> = <em>your-db-username</em></li>
+<li><code>DB_PASSWORD</code> = <em>your-db-password</em></li>
+</ul>
+</li>
+</ol>
+<p><br>
+<strong>Injecting DB_HOST (RDS endpoints) to Docker Image</strong></p>
+<p>Docker Image also needs the endpoints which is resulted from the Terraform&rsquo;s deployment. I output <code>endpoint</code> using <code>output.tf</code>, capture and exported it into Github Actions Environment.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#75715e"># terraform/output.tf
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">output</span> <span style="color:#e6db74">&#34;db_endpoint&#34;</span> {
+</span></span><span style="display:flex;"><span>  value <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_db_instance</span>.<span style="color:#66d9ef">nnotedb</span>.<span style="color:#66d9ef">endpoint</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>I also output <code>ecr_uri</code>, <code>cluster_arn</code>, <code>service_name</code>, and <code>region</code> for login ECR, push Docker image and reploy cluster service later on.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># .github/workflows/deploy.yml</span>
+</span></span><span style="display:flex;"><span>- name: Export Terraform output
+</span></span><span style="display:flex;"><span>        id: tf
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span>: success<span style="color:#f92672">()</span>
+</span></span><span style="display:flex;"><span>        run: |
+</span></span><span style="display:flex;"><span>          echo <span style="color:#e6db74">&#34;TF_EURI=</span><span style="color:#66d9ef">$(</span>terraform output -raw ecr_uri<span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> &gt;&gt; $GITHUB_ENV
+</span></span><span style="display:flex;"><span>          echo <span style="color:#e6db74">&#34;TF_CARN=</span><span style="color:#66d9ef">$(</span>terraform output -raw cluster_arn<span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> &gt;&gt; $GITHUB_ENV
+</span></span><span style="display:flex;"><span>          echo <span style="color:#e6db74">&#34;TF_SN=</span><span style="color:#66d9ef">$(</span>terraform output -raw service_name<span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> &gt;&gt; $GITHUB_ENV
+</span></span><span style="display:flex;"><span>          echo <span style="color:#e6db74">&#34;TF_REGION=</span><span style="color:#66d9ef">$(</span>terraform output -raw region<span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> &gt;&gt; $GITHUB_ENV
+</span></span><span style="display:flex;"><span>          HOST<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span>terraform output -raw db_endpoint<span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> | cut -d <span style="color:#e6db74">&#39;:&#39;</span> -f1<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>          echo <span style="color:#e6db74">&#34;TF_ENDPOINT=</span>$HOST<span style="color:#e6db74">&#34;</span> &gt;&gt; $GITHUB_ENV
+</span></span><span style="display:flex;"><span>        working-directory: ./terraform
+</span></span></code></pre></div><p><br>
+<strong>Login AWS ECR</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span>- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Log in to ECR</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">run</span>: <span style="color:#ae81ff">aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $TF_EURI</span>
+</span></span></code></pre></div><p><strong>Build and Push Docker</strong>
+Along with <strong>4c</strong> and <strong>4d</strong>, I inject these 4 variables while building the Docker image</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span>- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Build Docker</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">run</span>: <span style="color:#ae81ff">|</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#ae81ff">docker build \</span>
+</span></span><span style="display:flex;"><span>		--<span style="color:#ae81ff">build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \</span>
+</span></span><span style="display:flex;"><span>		--<span style="color:#ae81ff">build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \</span>
+</span></span><span style="display:flex;"><span>		--<span style="color:#ae81ff">build-arg DB_NAME=${{ secrets.DB_NAME }} \</span>
+</span></span><span style="display:flex;"><span>		--<span style="color:#ae81ff">build-arg DB_HOST=${{ env.TF_ENDPOINT }} \</span>
+</span></span><span style="display:flex;"><span>		-<span style="color:#ae81ff">t nnote-app .</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Tag Docker</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">run</span>: <span style="color:#ae81ff">docker tag nnote-app:latest $TF_EURI:latest</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Push Docker</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">run</span>: <span style="color:#ae81ff">docker push $TF_EURI:latest</span>
+</span></span></code></pre></div><p><strong>Redeploy Cluster Service</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span>- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Force Redeployment ECS</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">run</span>: <span style="color:#ae81ff">aws ecs update-service --cluster $TF_CARN --service $TF_SN --force-new-deployment --region $TF_REGION</span>
+</span></span></code></pre></div><p><strong>Roll back if fail()</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span>- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Auto clean up if Apply failed</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">if</span>: <span style="color:#ae81ff">failure()</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">run</span>: <span style="color:#ae81ff">|</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#ae81ff">terraform destroy --auto-approve -var=&#39;db_name=&#34;a&#34;&#39; -var=&#39;db_password=&#34;b&#34;&#39; -var=&#39;db_username=&#34;c&#34;&#39;</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#ae81ff">aws s3 rm s3://nnote-tfstate-031225 --recursive</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#ae81ff">aws s3 rb s3://nnote-tfstate-031225 --force</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">working-directory</span>: <span style="color:#ae81ff">./terraform</span>
+</span></span></code></pre></div><h2 id="5b-debugging">5b. Debugging:<a hidden class="anchor" aria-hidden="true" href="#5b-debugging">#</a></h2>
+<p>I ran into a couple of issues</p>
+<p><strong>Issue 1:</strong> RDS Endpoint from Terraform output contains <code>:3306</code>
+Solution: cut the <code>:3306</code> from the string</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#75715e"># .github/workflows/deploy.yml</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">HOST=$(echo &#34;$(terraform output -raw db_endpoint)&#34; | cut -d &#39;:&#39; -f1)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">echo &#34;TF_ENDPOINT=$HOST&#34; &gt;&gt; $GITHUB_ENV</span>
+</span></span></code></pre></div><p><strong>Issue 2:</strong> Container cannot authenticate with Database unless I use MySQL Workbench to drop the schemas and redeploy Cluster Service
+Solution: remove <code>db_name = var.db_name</code> when create aws_rds_instance</p>
+<p>Before&hellip;</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_db_instance&#34; &#34;nnotedb&#34;</span> {
+</span></span><span style="display:flex;"><span>  db_name                <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">db_name</span>
+</span></span><span style="display:flex;"><span>  allocated_storage      <span style="color:#f92672">=</span> <span style="color:#ae81ff">20</span>
+</span></span><span style="display:flex;"><span>  engine                 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;mysql&#34;</span>
+</span></span><span style="display:flex;"><span>  engine_version         <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;8.0&#34;</span>
+</span></span><span style="display:flex;"><span>  instance_class         <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">db_instance_class</span>
+</span></span><span style="display:flex;"><span>  username               <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">db_username</span>
+</span></span><span style="display:flex;"><span>  password               <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">db_password</span>
+</span></span><span style="display:flex;"><span>  vpc_security_group_ids <span style="color:#f92672">=</span> [<span style="color:#66d9ef">aws_security_group</span>.<span style="color:#66d9ef">nnote_vpc_sg</span>.<span style="color:#66d9ef">id</span>]
+</span></span><span style="display:flex;"><span>  db_subnet_group_name   <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_db_subnet_group</span>.<span style="color:#66d9ef">nnotedb</span>.<span style="color:#66d9ef">name</span>
+</span></span><span style="display:flex;"><span>  skip_final_snapshot    <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  publicly_accessible    <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>After&hellip;</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_db_instance&#34; &#34;nnotedb&#34;</span> {
+</span></span><span style="display:flex;"><span>  allocated_storage      <span style="color:#f92672">=</span> <span style="color:#ae81ff">20</span>
+</span></span><span style="display:flex;"><span>  engine                 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;mysql&#34;</span>
+</span></span><span style="display:flex;"><span>  engine_version         <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;8.0&#34;</span>
+</span></span><span style="display:flex;"><span>  instance_class         <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">db_instance_class</span>
+</span></span><span style="display:flex;"><span>  username               <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">db_username</span>
+</span></span><span style="display:flex;"><span>  password               <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">db_password</span>
+</span></span><span style="display:flex;"><span>  vpc_security_group_ids <span style="color:#f92672">=</span> [<span style="color:#66d9ef">aws_security_group</span>.<span style="color:#66d9ef">nnote_vpc_sg</span>.<span style="color:#66d9ef">id</span>]
+</span></span><span style="display:flex;"><span>  db_subnet_group_name   <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_db_subnet_group</span>.<span style="color:#66d9ef">nnotedb</span>.<span style="color:#66d9ef">name</span>
+</span></span><span style="display:flex;"><span>  skip_final_snapshot    <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  publicly_accessible    <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h2>
+<h3 id="ref1"><strong>[1] MYSQL vs SQLite</strong><a hidden class="anchor" aria-hidden="true" href="#ref1">#</a></h3>
+<p><a href="https://www.greengeeks.com/blog/sqlite-vs-mysql/#:~:text=Ultimately%2C%20SQLite%20is%20a%20lightweight,go%2Dto%20for%20RDBMS%20solutions">https://www.greengeeks.com/blog/sqlite-vs-mysql/#:~:text=Ultimately%2C%20SQLite%20is%20a%20lightweight,go%2Dto%20for%20RDBMS%20solutions</a></p>
+<h3 id="ref2"><strong>[2] Gunicorn</strong><a hidden class="anchor" aria-hidden="true" href="#ref2">#</a></h3>
+<p><a href="https://flask.palletsprojects.com/en/stable/deploying/gunicorn/">https://flask.palletsprojects.com/en/stable/deploying/gunicorn/</a></p>
+<h3 id="ref2"><strong>[3] AWS ECS</strong><a hidden class="anchor" aria-hidden="true" href="#ref2">#</a></h3>
+<p><a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-container-image.html">https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-container-image.html</a></p>
+<h3 id="ref2"><strong>[4] AWS OICD</strong><a hidden class="anchor" aria-hidden="true" href="#ref2">#</a></h3>
+<p><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html">https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html</a></p>
+<h3 id="ref2"><strong>[5] GitHub Actions and AWS OICD</strong><a hidden class="anchor" aria-hidden="true" href="#ref2">#</a></h3>
+<p><a href="https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services">https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html</a></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer><div id="disqus_thread"></div>
+<script>
+    
+
+    
+
+    (function() { 
+    var d = document, s = d.createElement('script');
+    s.src = 'https://www-nvo-one.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2025 <a href="http://localhost:1313/">nathaniel</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

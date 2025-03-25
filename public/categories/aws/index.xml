@@ -2,25 +2,26 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>AWS on nathaniel</title>
-    <link>http://www.nvo.one/categories/aws/</link>
+    <link>http://localhost:1313/categories/aws/</link>
     <description>Recent content in AWS on nathaniel</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 16 Jan 2024 11:32:20 -0800</lastBuildDate>
-    <atom:link href="http://www.nvo.one/categories/aws/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/categories/aws/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>build AWS network infrastructure and deploy resources using Terraform</title>
-      <link>http://www.nvo.one/posts/004-automate-iac/</link>
+      <link>http://localhost:1313/posts/004-automate-iac/</link>
       <pubDate>Tue, 16 Jan 2024 11:32:20 -0800</pubDate>
-      <guid>http://www.nvo.one/posts/004-automate-iac/</guid>
+      <guid>http://localhost:1313/posts/004-automate-iac/</guid>
       <description>1. Source Code https://github.com/nhatvo1502/Automate-IaC/tree/main 2. What the code does 2.1. create-resource.yml configure aws credential verify aws credential verify aws s3 permission create s3 bucket for terraform backend copy file from GH to runner verify terraform file terraform init -&amp;gt; apply 2.2 destroy-resource.yml configure aws credential copy file from GH to runner verify terraform file terraform init -&amp;gt; destroy empty s3 backend bucket delete-bucket 2.3 main.tf configure s3 as backend create an s3 bucket create a keypair using a public key from GitHub Secret AMI lookup create VPC create a subnet create a network interface create EC2 instance 3.</description>
     </item>
     <item>
       <title>get aws credential report using github action</title>
-      <link>http://www.nvo.one/posts/002-aws-credential-report/</link>
+      <link>http://localhost:1313/posts/002-aws-credential-report/</link>
       <pubDate>Mon, 15 Jan 2024 10:10:29 -0800</pubDate>
-      <guid>http://www.nvo.one/posts/002-aws-credential-report/</guid>
-      <description>I. Introduction This project is inspired by one of my dear friend. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It&amp;rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.&#xA;II. Our Game-plan We will leverage Github Action to execute a set of commands to generate AWS Credential Report, download it, decode, pipe the content into csv file and finally copy to a existing S3 bucket.</description>
+      <guid>http://localhost:1313/posts/002-aws-credential-report/</guid>
+      <description>I. Introduction This project is inspired by one of my dear friend. Instead of using the AWS Console to generate a credential report, we would set up a runner on GitHub Actions to automate this task. It&amp;rsquo;s a very cool experiment, and I hope that by the end, I can apply and scale this concept into a part of a bigger project down the road.
+II. Our Game-plan We will leverage Github Action to execute a set of commands to generate AWS Credential Report, download it, decode, pipe the content into csv file and finally copy to a existing S3 bucket.</description>
     </item>
   </channel>
 </rss>
