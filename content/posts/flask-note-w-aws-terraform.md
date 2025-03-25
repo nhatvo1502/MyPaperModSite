@@ -4,7 +4,7 @@ date: 2025-03-07T07:54:28-08:00
 draft: false
 author: Nhat Vo
 ---
-Deploy infrastructure using Terraform [¹](#ref1), AWS Lambda [²](#ref2), and GitHub Actions [³](#ref3).
+
 ![image](/images/nnote/python-website.drawio.png)
 
 During a conversation with a close friend in Australia, I was inspired by the idea of using a lightweight framework like Flask to build a cloud application. Thanks @terryduong for the inspiration and support for this project.
@@ -143,7 +143,8 @@ def reset_password():
 4. Build app as Docker
 
 **MySQL Server**
-SQLite is lightweight and good for small project but AWS doesn't support this engine officially. I chose MySQL because it's cost-effective, user friendly and supported by AWS **[1]**.
+SQLite is lightweight and good for small project but AWS doesn't support this engine officially. I chose MySQL
+[¹](#ref1) because it's cost-effective, user friendly and supported by AWS.
 
 Install [MySQL](https://dev.mysql.com/downloads/installer/) and [MySQL Workbench](https://dev.mysql.com/downloads/workbench/)
 
@@ -209,9 +210,9 @@ python .\main.py
 
 Now, all we need to to pack all the dependencies into `requirements.txt` and get ready to build a Docker image. But before that, I need **Gunicorn**
 
-**Gunicorn**
+## 2b. Gunicorn:
 
-While Flask is great for development, its server is not suitable for concurrent traffics in production envrinonment. I choose Gunicorn **[2]** to handle Flask's shortcoming.
+While Flask is great for development, its server is not suitable for concurrent traffics in production envrinonment. I choose Gunicorn [²](#ref2) to handle Flask's shortcoming.
 
 \
 To install...
@@ -246,7 +247,7 @@ EXPOSE 5000
 CMD ["gunicorn", "-b", "0.0.0.0:5000", "website:create_app()"]
 ```
 
-## 2b. Testing:
+## 2c. Testing:
 
 build and run Docker
 
@@ -304,7 +305,7 @@ def create():
 
 **ECR**
 
-1. To create a **Elastic Container Repo** **[3]**, navigate to _AWS Console_ -> _Amazon Elastic Container Registry_ -> _repository_ -> _Create depository_
+1. To create a **Elastic Container Repo** [³](#ref3), navigate to _AWS Console_ -> _Amazon Elastic Container Registry_ -> _repository_ -> _Create depository_
 2. Configure:
    - Repository name = `nnote-ecr/app`
    - Image tag mutability = `Mutable`
@@ -537,7 +538,7 @@ The goal of this stage is to transform my app into a ready-to-deploy application
 
 **AWS OICD**
 
-I read **[4]** **[5]** to setup AWS OICD role. It seems very straight forward so I won't document these steps. You will need to configre this from your AWS IAM using your Github token.
+I read [⁴](#ref4) [⁵](#ref5) to setup AWS OICD role. It seems very straight forward so I won't document these steps. You will need to configre this from your AWS IAM using your Github token.
 
 \
 **Injecting Secrets to Docker Image**
@@ -683,14 +684,24 @@ resource "aws_db_instance" "nnotedb" {
 ### **[1] MYSQL vs SQLite** {#ref1} 
 [https://www.greengeeks.com/blog/sqlite-vs-mysql/#:~:text=Ultimately%2C%20SQLite%20is%20a%20lightweight,go%2Dto%20for%20RDBMS%20solutions](https://www.greengeeks.com/blog/sqlite-vs-mysql/#:~:text=Ultimately%2C%20SQLite%20is%20a%20lightweight,go%2Dto%20for%20RDBMS%20solutions)
 
+[go back](#2a-workflows)
+
 ### **[2] Gunicorn** {#ref2} 
 [https://flask.palletsprojects.com/en/stable/deploying/gunicorn/](https://flask.palletsprojects.com/en/stable/deploying/gunicorn/)
 
-### **[3] AWS ECS** {#ref2} 
+[go back](#2b-gunicorn)
+
+### **[3] AWS ECS** {#ref3} 
 [https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-container-image.html](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-container-image.html)
 
-### **[4] AWS OICD** {#ref2} 
+[go back](#3a-workflows)
+
+### **[4] AWS OICD** {#ref4} 
 [https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html)
 
-### **[5] GitHub Actions and AWS OICD** {#ref2} 
+[go back](#5a-github-actions-workflow)
+
+### **[5] GitHub Actions and AWS OICD** {#ref5} 
 [https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
+
+[go back](#5a-github-actions-workflow)

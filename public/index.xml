@@ -13,7 +13,7 @@
       <link>http://localhost:1313/posts/flask-note-w-aws-terraform/</link>
       <pubDate>Fri, 07 Mar 2025 07:54:28 -0800</pubDate>
       <guid>http://localhost:1313/posts/flask-note-w-aws-terraform/</guid>
-      <description>Deploy infrastructure using Terraform ¹, AWS Lambda ², and GitHub Actions ³. During a conversation with a close friend in Australia, I was inspired by the idea of using a lightweight framework like Flask to build a cloud application. Thanks @terryduong for the inspiration and support for this project.
+      <description>During a conversation with a close friend in Australia, I was inspired by the idea of using a lightweight framework like Flask to build a cloud application. Thanks @terryduong for the inspiration and support for this project.
 Check out my project on GitHub
 Stage 0: Game plan I split this project into five stages.
 Stage 1: Creating the app Stage 2: Host locally Stage 3: Hosting on AWS using Console Stage 4: Hosting on AWS using Terraform Stage 5: Automate the deployment using Terraform and Github Actions A Reference List at the end of this page includes all the documents I consulted throughout this project.</description>
