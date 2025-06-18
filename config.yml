@@ -34,7 +34,7 @@ params:
     limit: 10 # refer: https://www.fusejs.io/api/methods.html#search
     keys: ["title", "permalink", "summary", "content"]
 
-  defaultTheme: dark
+  defaultTheme: light
   ShowReadingTime: true
   ShowToc: true
   TocOpen: true
