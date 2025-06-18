@@ -41,23 +41,19 @@ params:
   ShowBreadCrumbs: true
   ShowCodeCopyButtons: true
   profileMode:
-        enabled: true
-        title: "Hi " # optional default will be site title
-        subtitle: "welcome to my cloud \U00002601 blog"
-        imageUrl: "/images/stock/grandcanyon4.jpg"
-        imageWidth: 180 # custom size
-        imageHeight: 180 # custom size
+    enabled: true
+    title: "Hi " # optional default will be site title
+    subtitle: "welcome to my cloud \U00002601 blog"
+    imageUrl: "/images/stock/grandcanyon4.jpg"
+    imageWidth: 180 # custom size
+    imageHeight: 180 # custom size
         
 
   socialIcons:
     - name: "GitHub"
       url: https://github.com/nhatvo1502?tab=repositories
-    - name: "Discord"
-      url: https://discordapp.com/users/292528434268340224
     - name: "Spotify"
       url: https://open.spotify.com/playlist/0Hg1dUGKzWfEHf7eETZhAO?si=bdef1889cd864ada
-    - name: "Strava"
-      url: https://www.strava.com/athletes/128331132
   
 
 menu:
