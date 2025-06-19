@@ -6,7 +6,6 @@ author: Nhat Vo
 comments: false
 ---
 
-"Humility is not thinking less of yourself, it's thinking of yourself less."
-- Rick Warren
+"Humility is not thinking less of yourself, it's thinking of yourself less." - Rick Warren
 
 ![image](/images/stock/about-me.jpg)
