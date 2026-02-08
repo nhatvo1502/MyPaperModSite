@@ -1,4 +1,4 @@
-# Clone:
+# Clone
 ```bash
 git clone https://github.com/nhatvo1502/MyPaperModSite.git
 ```
@@ -15,4 +15,4 @@ hugo server -D
 ```
 
 # Posting
-simply pushing code will trigger github action with pre-embedded credentials for posting
+Simply pushing code will trigger GHA. GHA is already bundled with hosting credentials and will take care of posting automatically.
