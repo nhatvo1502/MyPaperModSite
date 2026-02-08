@@ -1,15 +1,15 @@
 name: Deploy www.nvo.one
 
 on:
-  # push:
-  #   branches:
-  #     - master
-  # workflow_dispatch:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
       - publish
+  workflow_dispatch:
+  # pull_request:
+  #   types:
+  #     - closed
+  #   branches:
+  #     - publish
 
 jobs:
   Deploy-to-S3:
