@@ -4,6 +4,7 @@ git clone https://github.com/nhatvo1502/MyPaperModSite.git
 ```
 
 # Install Hugo + Papermod submodel
+Only required for running server locally
 ```bash
 git submodule update --init --recursive
 sudo snap install hugo
